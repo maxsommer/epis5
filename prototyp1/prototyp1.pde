@@ -1,3 +1,17 @@
+/*
+/
+/	to do:
+/	
+/	- kommentieren
+/	- doppelte connection zwischen städten verhindern
+/	- alle einzelnen verbindungskreise verbinden
+/	
+/	- menschen hinzufügen
+/	- "leben" simulieren (arbeiten, zuhause sein, pendeln, ...)
+/	- infektion simulieren (bei x nähe, ansteckunswahrscheinlichkeit)
+/
+*/
+
 Simulation sim = new Simulation();
 int reassignNeeds = 0;
 
@@ -12,7 +26,7 @@ void setup(){
 
 void draw(){
   
- 	background(255);
+ 	background(0);
   
  	if(sim.isStarted()){
     		sim.update();

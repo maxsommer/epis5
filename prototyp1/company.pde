@@ -1,7 +1,0 @@
-class Company{
-  
-  	public Company(){
-  		
-  	}
-  
-}
