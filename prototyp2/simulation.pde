@@ -10,16 +10,17 @@ class Simulation{
 	ArrayList <District> districts = new ArrayList<District>();	// Liste aller Stadtteile
 	ArrayList <Message> messages = new ArrayList<Message>();	// Liste aller Messages
 	boolean generated = false;					// Ist wahr wenn die Simulation schon generiert wurde.
-	City city;
+	City city;							// Stadtobjekt
+	int reassignNeeds = 0;						// Wie oft mussten die Stadtteile umpositioniert werden?
 
 
 	//	Parameter
 	int maxNumberOfDistricts 	= 7;
-	int minNumberOfDistricts 	= 3;
-	int maxDistrictPopulation	= 100;
-	int minDistrictPopulation	= 25;
-	boolean debugMode		= true;
+	int minNumberOfDistricts 	= 2;
+	int maxDistrictPopulation	= 300;
+	int minDistrictPopulation	= 200;
 	int defaultMessageTimer 	= 4000;
+	int maxReassignNeeds		= 100;
 
 
 
@@ -42,6 +43,9 @@ class Simulation{
 		if(!generated){ 
 			generateSimulation();
 		}
+
+		//	Stadt updaten
+		city.update();
 
 		//	Stadtteile updaten
 		for( int i = 0; i < districts.size(); i++ ){
@@ -68,6 +72,9 @@ class Simulation{
 	// 	anzeigen.
 	public void render(){
 
+		// 	Stadt zeichnen
+		city.render();
+
 		//	Objekte zeichnen
 		for( int i = 0; i < districts.size(); i++ ){
 
@@ -76,10 +83,16 @@ class Simulation{
 		}
 
 		//	Bildrate und Objektanzahl
-		fill( 255 );
-		text( "fps:       " + (int)frameRate,  10, 20 );
-		text( "objects: " + districts.size(), 10, 36 );
-		text( "'r' to restart", 10, 68 );
+		if( debugMode ){
+
+			fill( 0 );
+			text( "fps:       " + (int)frameRate,  10, 20 );
+			text( "objects: " + districts.size(), 10, 36 );
+			text( "reassigns: " + reassignNeeds, 10, 52 );
+			text( "'r' to restart", 10, 68 );
+			text( "'d' toggle debug mode", 10, 84 );
+
+		}
 
 		//	Messages rendern
 		for( int i = 0; i < messages.size(); i++ ){
@@ -105,8 +118,8 @@ class Simulation{
 
 			//	neuer Stadteil: District( X-Position, Y-Position, Population );
 			District d = new District( 	
-					(int)random(0, simulation.windowX), 
-					(int)random(0, simulation.windowY), 
+					windowX/2 + (int)random(-city.diameter/2, city.diameter/2), 
+					windowY/2 + (int)random(-city.diameter/2, city.diameter/2), 
 					(int)random(minDistrictPopulation, maxDistrictPopulation) 
 					);
 
@@ -125,9 +138,17 @@ class Simulation{
 		for( int i = 0; i < districts.size(); i++ ){
 			District d2 = districts.get(i);
 
-			if( d2.position.dist( d.position ) < (d2.population + d.population) ){
+			if( d2.position.dist( d.position ) < (d2.population/2 + d.population/2) ){
+
 				return false;	//	Überschneidung mit anderem Stadtteil
+
 			}
+
+		}
+
+		if( PVector.dist( city.position, d.position ) > city.diameter/2 ){
+
+			return false;	// der Stadtteil wäre außerhalb der Stadt
 
 		}
 
@@ -137,20 +158,12 @@ class Simulation{
 
 	public void addMessage( String msg, int timer ){
 
-		if(debugMode){
-
-			messages.add( new Message(msg, timer) );
-
-		}
+		messages.add( new Message(msg, timer) );
 
 	}
 	public void addMessage( String msg ){
 
-		if(debugMode){
-
-			messages.add( new Message(msg, defaultMessageTimer) );
-
-		}
+		messages.add( new Message(msg, defaultMessageTimer) );
 
 	}
 

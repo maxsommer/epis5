@@ -6,14 +6,24 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt.
 
+//	Prototyp 2, Version 2
+//	Probleme:
+//		+ NullPointerException bei restart()
 
-//	globale Variablen
-Simulation simulation = new Simulation( 500, 500 );
+
+//	Einstellungen
+PVector resolution 		= new PVector(1440, 900);
+boolean fullscreen 		= true;	
+boolean debugMode		= false;
+
+
+//	Globale Variablen
+Simulation simulation 		= new Simulation( (int)resolution.x, (int)resolution.y );
 
 void setup(){
 
 	size( simulation.windowX , simulation.windowY, P2D );
-	background( 0 );
+	background( 255 );
 	frameRate( 120 );
 	smooth( 8 );
 	
@@ -33,20 +43,29 @@ void draw(){
 }
 
 void keyPressed(){
-	if( key == 'r'){
+
+	if( key == 'r' ){
 		restart();
 	}
+	else if( key == 'd' ){
+		debugMode = !debugMode;
+	}
+
 }
 
 public void clearScreen(){ 
 
-	background( 0 ); 
+	background( 255 ); 
 
 }
 
 public void restart(){
 
 	simulation = null;
-	simulation = new Simulation( 500, 500 );
+	simulation = new Simulation( (int)resolution.x, (int)resolution.y );
 
+}
+
+boolean sketchFullScreen(){
+	return fullscreen;
 }

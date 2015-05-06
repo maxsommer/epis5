@@ -17,9 +17,13 @@ class Message{
 
 	public void render( int place ){
 
-		float alphac = (timer / millis())/2 * 255;
-		fill( 0, 255, 255, alphac );
-		text( message, 10, simulation.windowY - (place*16) );
+		if( debugMode ){
+
+			float alphac = (timer / millis())/2 * 255;
+			fill( 0, 255, 0, alphac );
+			text( message, 10, simulation.windowY - (place*16) );
+
+		}
 
 	}
 

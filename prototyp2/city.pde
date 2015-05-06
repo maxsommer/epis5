@@ -3,16 +3,16 @@
 //	jeder Bewohner besuchen kann und zwischen denen er umher
 //	reist.
 
-class City implements Object{
+class City{
 
 	PVector position;
 	float diameter;
-	color cityColor = color( 255, 255, 255, 128 );
+	color cityColor = color( 0, 10 );
 
 	public City(){
 
 		position = new PVector( simulation.windowX / 2, simulation.windowY / 2 );
-		diameter = simulation.windowX - 20;
+		diameter = simulation.windowY - 20;
 
 	}
 
