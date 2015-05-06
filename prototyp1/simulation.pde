@@ -17,6 +17,8 @@ class Simulation{
 		}
 
 		generateConnections();
+
+		checkConnections();
 	    
 	}
   
@@ -118,6 +120,19 @@ class Simulation{
     
 	return true;
     
+	}
+
+	public void checkConnections(){
+
+		Connection currentCon = null;
+
+		// doppelte Connections löschen
+		for(int i = 0; i < connections.size(); i++){
+
+			currentCon = connections.get(i);
+
+		}
+
 	}
   
 }
