@@ -6,9 +6,10 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt.
 
-//	Prototyp 2, Version 2
+//	Prototyp 2, Version 3
 //	Probleme:
 //		+ NullPointerException bei restart()
+//		möglicherweise memory überschreitung? Oo
 
 
 //	Einstellungen

@@ -1,6 +1,7 @@
 //	District
 //	Wie der Name schon sagt ist jedes District ein Stadtteil unserer Stadt.
 
+
 class District{
 
 	PVector position;

@@ -2,6 +2,7 @@
 //	Message-Objekte sind Meldungen, die über eine bestimmte Zeit
 //	auf dem Bildschirm angezeigt werden.
 
+
 class Message{
 
 	float timer;

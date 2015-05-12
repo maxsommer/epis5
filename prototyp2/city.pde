@@ -3,6 +3,7 @@
 //	jeder Bewohner besuchen kann und zwischen denen er umher
 //	reist.
 
+
 class City{
 
 	PVector position;

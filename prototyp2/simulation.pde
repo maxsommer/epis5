@@ -9,16 +9,18 @@ class Simulation{
 	int windowX, windowY;						// Fenstergröße
 	ArrayList <District> districts = new ArrayList<District>();	// Liste aller Stadtteile
 	ArrayList <Message> messages = new ArrayList<Message>();	// Liste aller Messages
+	ArrayList <Human> humans = new ArrayList<Human>();	// Liste aller Menschen
 	boolean generated = false;					// Ist wahr wenn die Simulation schon generiert wurde.
 	City city;							// Stadtobjekt
 	int reassignNeeds = 0;						// Wie oft mussten die Stadtteile umpositioniert werden?
+	int humanSize = 10;
 
 
 	//	Parameter
 	int maxNumberOfDistricts 	= 7;
 	int minNumberOfDistricts 	= 2;
 	int maxDistrictPopulation	= 300;
-	int minDistrictPopulation	= 200;
+	int minDistrictPopulation	= 125;
 	int defaultMessageTimer 	= 4000;
 	int maxReassignNeeds		= 100;
 
@@ -54,6 +56,14 @@ class Simulation{
 			d.update();
 		}
 
+		//	Menschen updaten
+		for( int i = 0; i < humans.size(); i++ ){
+
+			Human h = humans.get(i);
+			h.update();
+
+		}
+
 		//	Messages updaten
 		for( int i = 0; i < messages.size(); i++ ){
 
@@ -75,11 +85,20 @@ class Simulation{
 		// 	Stadt zeichnen
 		city.render();
 
-		//	Objekte zeichnen
+		//	Stadtteile zeichnen
 		for( int i = 0; i < districts.size(); i++ ){
 
 			District d = districts.get(i);
 			d.render();
+
+		}
+
+		//	Menschen zeichnen
+		for( int i = 0; i < humans.size(); i++ ){
+
+			Human h = humans.get(i);
+			h.render();
+
 		}
 
 		//	Bildrate und Objektanzahl
@@ -87,10 +106,11 @@ class Simulation{
 
 			fill( 0 );
 			text( "fps:       " + (int)frameRate,  10, 20 );
-			text( "objects: " + districts.size(), 10, 36 );
+			text( "districts: " + districts.size(), 10, 36 );
 			text( "reassigns: " + reassignNeeds, 10, 52 );
-			text( "'r' to restart", 10, 68 );
-			text( "'d' toggle debug mode", 10, 84 );
+			text( "humans: " + humans.size(), 10, 68 );
+			text( "'r' to restart", 10, 84 );
+			text( "'d' toggle debug mode", 10, 100 );
 
 		}
 
@@ -116,15 +136,24 @@ class Simulation{
 		//	generiert. Diese sind dann jeweilig nochmal verschieden groß.
 		for( int i = 0; i < (int)random( minNumberOfDistricts, maxNumberOfDistricts ); i++ ){
 
+			//	hier wird die Populationszahl für den Stadtteil generiert
+			int rPopulation = (int)random(minDistrictPopulation, maxDistrictPopulation);
+
 			//	neuer Stadteil: District( X-Position, Y-Position, Population );
 			District d = new District( 	
 					windowX/2 + (int)random(-city.diameter/2, city.diameter/2), 
 					windowY/2 + (int)random(-city.diameter/2, city.diameter/2), 
-					(int)random(minDistrictPopulation, maxDistrictPopulation) 
+					rPopulation
 					);
 
 			districts.add( d );
 			addMessage( "District::district"+i+" created" );
+
+			for ( int j = 0; j < rPopulation; j++){
+
+				humans.add( new Human( d ) );
+
+			}
 
 		} 
 
@@ -153,6 +182,20 @@ class Simulation{
 		}
 
 		return true;	//	Position okay, keine Überschneidung mit anderem Stadtteil
+
+	}
+
+	public boolean checkHumanPlacement( Human h ){
+
+		District d = h.homeDistrict;
+
+		if( PVector.dist( d.position, h.position ) > d.population/2 ){
+
+			return false;	// der Mensch wäre außerhalb des Stadtteils
+
+		}
+
+		return true;
 
 	}
 
