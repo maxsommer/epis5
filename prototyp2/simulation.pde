@@ -13,14 +13,15 @@ class Simulation{
 	boolean generated = false;					// Ist wahr wenn die Simulation schon generiert wurde.
 	City city;							// Stadtobjekt
 	int reassignNeeds = 0;						// Wie oft mussten die Stadtteile umpositioniert werden?
-	int humanSize = 10;
+	float humanSize = 5.0;						// Größe der einzelnen Menschlein
+	Camera cam = new Camera();					// Kameraobjekt
 
 
 	//	Parameter
 	int maxNumberOfDistricts 	= 7;
 	int minNumberOfDistricts 	= 2;
-	int maxDistrictPopulation	= 300;
-	int minDistrictPopulation	= 125;
+	int maxDistrictPopulation	= 350;
+	int minDistrictPopulation	= 150;
 	int defaultMessageTimer 	= 4000;
 	int maxReassignNeeds		= 100;
 
@@ -45,6 +46,9 @@ class Simulation{
 		if(!generated){ 
 			generateSimulation();
 		}
+
+		//	Kamera updaten
+		cam.update();
 
 		//	Stadt updaten
 		city.update();

@@ -14,7 +14,7 @@
 class Human{
 
 	PVector position;
-	color humanColor = color(0,255,128, 128);
+	color humanColor = color(0,255,128, 180);
 	int state;
 
 	District homeDistrict;
@@ -47,7 +47,12 @@ class Human{
 
 		noStroke();
 		fill( humanColor );
-		ellipse( position.x, position.y, simulation.humanSize, simulation.humanSize );
+		ellipse( 
+			(position.x + simulation.cam.getPosition().x) * simulation.cam.getZoom(), 
+			(position.y + simulation.cam.getPosition().y) * simulation.cam.getZoom(), 
+			simulation.humanSize * simulation.cam.getZoom(), 
+			simulation.humanSize * simulation.cam.getZoom() 
+		);
 
 	}
 

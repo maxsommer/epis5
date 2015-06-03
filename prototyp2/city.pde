@@ -29,7 +29,12 @@ class City{
 
 		noStroke();
 		fill( cityColor );
-		ellipse( position.x, position.y, diameter, diameter );
+		ellipse( 
+			(position.x + simulation.cam.getPosition().x) * simulation.cam.getZoom(), 
+			(position.y + simulation.cam.getPosition().y) * simulation.cam.getZoom(), 
+			diameter * simulation.cam.getZoom(), 
+			diameter * simulation.cam.getZoom() 
+		);
 
 	}
 	

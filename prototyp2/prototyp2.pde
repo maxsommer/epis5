@@ -6,10 +6,17 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt.
 
-//	Prototyp 2, Version 3
+//	Prototyp 2, Version 4
 //	Probleme:
 //		+ NullPointerException bei restart()
 //		möglicherweise memory überschreitung? Oo
+//	
+//	In Arbeit:
+//		
+//	Zu tun:
+//		+ GUI
+//		+ Kamera (für Nahansicht)
+//		+ Tagesablauf Menschen
 
 
 //	Einstellungen
@@ -50,6 +57,10 @@ void keyPressed(){
 	}
 	else if( key == 'd' ){
 		debugMode = !debugMode;
+	}
+	else if( key == 'z' ){
+		simulation.cam.setZoomGoal( 2.0 );
+		simulation.addMessage("ZoomGoal : 2.0");
 	}
 
 }

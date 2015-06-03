@@ -5,7 +5,7 @@
 class District{
 
 	PVector position;
-	int population;
+	float population;
 	color districtColor = color( 0, 128, 255, 200 );
 
 	public District( int x, int y, int _population ){
@@ -34,7 +34,12 @@ class District{
 
 		noStroke();
 		fill( districtColor );
-		ellipse( position.x, position.y, population, population );
+		ellipse( 
+			(position.x + simulation.cam.getPosition().x) * simulation.cam.getZoom() , 
+			(position.y + simulation.cam.getPosition().y) * simulation.cam.getZoom() , 
+			population * simulation.cam.getZoom(), 
+			population * simulation.cam.getZoom() 
+		);
 
 	}
 
