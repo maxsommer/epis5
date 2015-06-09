@@ -74,6 +74,10 @@ class Human{
 	public void render(){
 
 		noStroke();
+
+		fill( myColorRed, myColorGreen, myColorBlue, 120 );
+		ellipse( position.x, position.y, radius+10, radius+10 );
+
 		fill( myColorRed, myColorGreen, myColorBlue );
 		ellipse( position.x, position.y, radius, radius );
 

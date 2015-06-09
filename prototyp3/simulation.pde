@@ -8,8 +8,10 @@ class Simulation{
 	PVector simResolution = new PVector( 0, 0 );
 	City city = new City( );
 
-	float infectionRange 	= 50;
-	float infectionRate 	= 1;
+	boolean paused = false;
+
+	float infectionRange 	= 60;
+	float infectionRate 	= 0.15;
 
 	//	Der Konstrukt erwartet zwei Parameter, die X & Y 
 	//	Auflösung mit der die Simulation laufen soll
@@ -28,7 +30,9 @@ class Simulation{
 	//	alle Objekte in der Simulation, die GUI und die Kamera, etc.
 	public void update(){
 
-		city.update();
+		if( !this.paused ){
+			city.update();
+		}
 
 	}
 
@@ -37,6 +41,27 @@ class Simulation{
 	public void render(){
 
 		city.render();
+
+		if( debugMode ){
+
+			fill( 0, 0, 230 );
+			text(frameRate+"fps", 20, 20);
+
+			if( this.paused ){
+				fill( 230, 0, 0);
+				text("Simulation is paused", 20, 40);
+
+			}else{
+				fill( 0, 230, 0 );
+				text("Simulation is running", 20, 40);
+			}
+
+			fill( 50 );
+			text("Press 'r' to restart", 20, 60);
+			text("Press 'd' to toggle debug mode", 20, 80);
+			text("Press 'p' to play/pause the simulation", 20, 100);
+
+		}
 
 	}
 

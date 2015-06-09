@@ -36,7 +36,7 @@ class City{
 				}
 			}
 
-			humans.get(0).infect();
+			humans.get( (int)random(0, humans.size()) ).infect();
 
 	}
 

@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 1
+//	Prototyp 3, Version 2
 //	
 //	In Arbeit:
 //		+ Klasse Simulation
@@ -23,6 +23,14 @@
 //		+ Simulation der Ansteckung
 //		+ Simulation der Auswirkung von Impfung
 //		+ GUI
+//
+//	Neuerungen:
+//		+ Menschen haben einen kleinen Kreis um sich, rein optisch (nicht final :D)
+//		+ Es gibt die Möglichkeit die Simulation neu zu starten
+//		+ Es gibt die Möglichkeit einen DebugModus ein- bzw. auszuschalten
+//		+ Die Infektionsrate & der Infektionsradius wurden ein bisschen verändert
+//		+ Man kann die Simulation jetzt pausieren
+//		+ Die Infektion startet jetzt zufällig bei einem Menschen der Stadt
 
 //	Einstellungen
 //
@@ -92,5 +100,29 @@ boolean percentChance( float percent ){
 	}
 
 	return false;
+
+}
+
+
+public void keyPressed(){
+
+	switch(key){
+
+		case 'r':
+		case 'R':
+			sim = new Simulation( windowResolution.x, windowResolution.y );
+		break;
+
+		case 'd':
+		case 'D':
+			debugMode = !debugMode;
+		break;
+
+		case 'p':
+		case 'P':
+			sim.paused = !sim.paused;
+		break;
+
+	}
 
 }
