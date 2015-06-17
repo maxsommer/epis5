@@ -8,20 +8,31 @@ class Human{
 	private float myColorRed = 0;
 	private float myColorGreen = 0;
 	private float myColorBlue = 200;
-	private int radius = 20;
-	private float colorPulse = 0;
-	private boolean colorPulsating = false;
+	private float radius = 0;
+	private float radiusExtended = 0;
+	private boolean relativeToCamera = true;
 
-	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus, 4: immun
+	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus
 	private int state = 0;
 	private Timer timer = new Timer( 10000 + random(-5000, 5000), true );
 
 
 	Human( float posX, float posY ){
 
-		position.x 	= posX;
-		position.y 	= posY;
-		colorPulse 	= random(0,100);
+		position.x 		= posX;
+		position.y 		= posY;
+		radius			= humanRadius;
+		radiusExtended	= humanRadiusExtended;
+
+	}
+
+	Human( float posX, float posY , boolean _relativeToCamera){
+
+		position.x 		= posX;
+		position.y 		= posY;
+		radius			= humanRadius;
+		radiusExtended	= humanRadiusExtended;
+		relativeToCamera	= _relativeToCamera;
 
 	}
 
@@ -30,7 +41,7 @@ class Human{
 
 		timer.update();
 
-		//	Wechsel von Stufe 1 auf 2
+		//	Wechsel von Status 1 (Infiziert, ohne Symptome) auf 2 (Infiziert, mit Symptomen)
 		if( state == 1 && !timer.paused && !timer.isAlive() ){
 
 			timer.reset();
@@ -40,11 +51,18 @@ class Human{
 
 		}
 
-		//	Soll die Farbe der einzelnen Menschen "pulsieren", so kann man die variable einfach auf true setzen
-		if(colorPulsating){
-			colorPulse += 0.04;
-			myColorBlue = 150 + 100*sin(colorPulse);
+		//	Wechsel von Status 2 (Infiziert, mit Symptomen) auf 3 (Krankenhaus)
+		if(state == 2 && !timer.paused && !timer.isAlive() ){
+
+			timer.reset();
+
+				if( percentChance( 13 ) ){
+					state = 3;
+				}
+
 		}
+
+		//	Farbe einstellen, je nach Status
 
 		if(state == 0){
 			myColorRed = 0;
@@ -56,15 +74,11 @@ class Human{
 			myColorBlue = 200;
 		}else if(state == 2){
 			myColorRed = 200;
-			myColorGreen = 0;
+			myColorGreen = 200;
 			myColorBlue = 0;
 		}else if(state == 3){
 			myColorRed = 200;
-			myColorGreen = 200;
-			myColorBlue = 200;
-		}else if(state == 4){
-			myColorRed = 0;
-			myColorGreen = 200;
+			myColorGreen = 0;
 			myColorBlue = 0;
 		}
 
@@ -75,11 +89,25 @@ class Human{
 
 		noStroke();
 
-		fill( myColorRed, myColorGreen, myColorBlue, 120 );
-		ellipse( position.x, position.y, radius+10, radius+10 );
+		if(relativeToCamera){
 
-		fill( myColorRed, myColorGreen, myColorBlue );
-		ellipse( position.x, position.y, radius, radius );
+			fill( myColorRed, myColorGreen, myColorBlue, 120 );
+			ellipse( position.x - sim.cam.getPosition().x, position.y - sim.cam.getPosition().y, radius+radiusExtended, radius+radiusExtended );
+
+			fill( myColorRed, myColorGreen, myColorBlue );
+			ellipse( position.x - sim.cam.getPosition().x, position.y - sim.cam.getPosition().y, radius, radius );
+
+		}
+
+		if(!relativeToCamera){
+
+			fill( myColorRed, myColorGreen, myColorBlue, 120 );
+			ellipse( position.x, position.y , radius+radiusExtended, radius+radiusExtended );
+
+			fill( myColorRed, myColorGreen, myColorBlue );
+			ellipse( position.x, position.y, radius, radius );
+			
+		}
 
 	}
 
@@ -116,6 +144,16 @@ class Human{
 			timer.start();
 		}
 
+	}
+
+
+	public void setState( int _state ){
+		state = _state;
+	}
+
+
+	public PVector getPosition(){
+		return position;
 	}
 
 }

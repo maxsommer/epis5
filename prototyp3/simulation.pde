@@ -7,6 +7,8 @@ class Simulation{
 
 	PVector simResolution = new PVector( 0, 0 );
 	City city = new City( );
+	Caption caption = new Caption();
+	Camera cam = new Camera();
 
 	boolean paused = false;
 
@@ -29,6 +31,9 @@ class Simulation{
 	//	Die update Methode wird bei jedem Drawcall einmal aufgerufen und updated
 	//	alle Objekte in der Simulation, die GUI und die Kamera, etc.
 	public void update(){
+
+		cam.update();
+		caption.update();
 
 		if( !this.paused ){
 			city.update();
@@ -63,6 +68,12 @@ class Simulation{
 
 		}
 
+		caption.render();
+
+	}
+
+	public PVector getResolution(){
+		return simResolution;
 	}
 
 }

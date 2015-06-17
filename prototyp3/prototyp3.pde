@@ -6,37 +6,41 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 2
+//	Prototyp 3, Version 3
 //	
 //	In Arbeit:
 //		+ Klasse Simulation
 //		+ Klasse City
 //		+ Klasse Human
+//		+ Klasse Caption
+//		+ Klasse Camera
 //		
 //	Zu tun:
 //		+ Klasse Simulation
 //		+ Klasse City
 //		+ Klasse Human
+//		+ Klasse Caption
 //		+ Klasse myChild
 //		+ Klasse Kindergarden
 //		+ Klasse Camera
-//		+ Simulation der Ansteckung
 //		+ Simulation der Auswirkung von Impfung
+//		+ Realistische Werte!
 //		+ GUI
 //
 //	Neuerungen:
-//		+ Menschen haben einen kleinen Kreis um sich, rein optisch (nicht final :D)
-//		+ Es gibt die Möglichkeit die Simulation neu zu starten
-//		+ Es gibt die Möglichkeit einen DebugModus ein- bzw. auszuschalten
-//		+ Die Infektionsrate & der Infektionsradius wurden ein bisschen verändert
-//		+ Man kann die Simulation jetzt pausieren
-//		+ Die Infektion startet jetzt zufällig bei einem Menschen der Stadt
+//		+ Es gibt jetzt eine Caption1
+//		+ Die Kamera kann jetzt bewegt werden (beschleunigte Bewegung)
 
 //	Einstellungen
 //
 PVector windowResolution = new PVector( 1440, 900 );
 boolean fullscreen = true;
 boolean debugMode = true;
+
+//	Globale Variablen
+float humanRadius 		= windowResolution.y/45;
+float humanRadiusExtended 	= windowResolution.y/90;
+
 
 //	Hier wird unser Simulationsobjekt erstellt
 //	die Parameter, die der Konstruktor erwartet sind einmal X und Y Auflösung
@@ -121,6 +125,11 @@ public void keyPressed(){
 		case 'p':
 		case 'P':
 			sim.paused = !sim.paused;
+		break;
+
+		case 'm':
+		case 'M':
+			sim.cam.moveTo( new PVector( 200, 30 ), 2000 );
 		break;
 
 	}

@@ -10,14 +10,15 @@ class City{
 	//	Die Liste mit den Menschen
 	private ArrayList<Human> humans = new ArrayList<Human>();
 	//	Wieviele Menschen soll es in wievielen Schichten geben?
-	private int[] numberOfHumansPerCircle = { 10, 20, 30, 40, 50 };
+	private int[] numberOfHumansPerCircle = {  6, 7, 8, 9, 10, 11, 10, 9, 8, 7, 6 };
 	//	Wieviel Abstand soll zwischen den Schichten sein?
-	private int spacing = 50;
+	private int spacing = 10;	//	bei der Kreisanordnung war es 50
 
 	City(){	
 
 		//	Stadt mit Menschen füllen
-
+		//	Das war der Algorithmus, um die Menschen in Kreisen, in mehreren Kreisschichten anzuordnen
+		/*
 			for( int j = 0; j < numberOfHumansPerCircle.length; j++){
 
 				//	Kreissegment für jedes Element ausrechnen
@@ -35,7 +36,31 @@ class City{
 
 				}
 			}
+		*/
 
+		//	Stadt mit Menschen füllen
+		//	Dieses Mal versuchen wir's in Hexagonraster Anordnung im Kreis
+			for( int j = 0; j < numberOfHumansPerCircle.length; j++ ){
+
+				float lineHeight	 = ( (numberOfHumansPerCircle.length * (spacing+humanRadius+humanRadiusExtended))  )/2;
+
+				for( int i = 0; i < numberOfHumansPerCircle[j]; i++ ){
+
+					float lineSpacing = ( (humanRadius+humanRadiusExtended+spacing) * numberOfHumansPerCircle[j] )/2;
+					
+					humans.add(
+						new Human(
+							position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
+							position.y + (j * (spacing+humanRadius+humanRadiusExtended)) - lineHeight
+							)
+					);
+
+				}
+
+			}
+
+
+			//	hier wird ein Mensch infiziert
 			humans.get( (int)random(0, humans.size()) ).infect();
 
 	}
