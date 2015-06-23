@@ -46,6 +46,7 @@ class Camera{
 
 		updateTimers();
 		updateMove();
+		updateZoom();
 
 	}
 
@@ -108,6 +109,34 @@ class Camera{
 				isMoving = false;
 				beforePosition = new PVector( 0,0 );
 				targetPosition = position;
+		}
+
+	}
+
+
+	private void updateZoom(){
+
+		//	Entspricht der Zoom nicht dem Zielzoom, muss gezoomt werden
+		if( targetZoom - zoom > 0.01 ){
+
+			if( !isZooming ){
+				zoomTimer.set( zoomTime );
+				zoomTimer.start();
+				isZooming = true;
+				beforeZoom = zoom;
+			}
+
+			zoom = 		easeInOutCubic(
+								zoomTimer.getTimer(),
+								beforeZoom, 
+								targetZoom,
+								zoomTime
+								) ;
+		}else{
+				zoomTimer.reset();
+				isZooming = false;
+				beforeZoom = zoom;
+				targetZoom = zoom;
 		}
 
 	}

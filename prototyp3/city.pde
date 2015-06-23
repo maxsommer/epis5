@@ -9,34 +9,18 @@ class City{
 	private PVector position = new PVector( windowResolution.x/2, windowResolution.y/2 );
 	//	Die Liste mit den Menschen
 	private ArrayList<Human> humans = new ArrayList<Human>();
-	//	Wieviele Menschen soll es in wievielen Schichten geben?
-	private int[] numberOfHumansPerCircle = {  6, 7, 8, 9, 10, 11, 10, 9, 8, 7, 6 };
-	//	Wieviel Abstand soll zwischen den Schichten sein?
-	private int spacing = 10;	//	bei der Kreisanordnung war es 50
+	//	Wieviele Menschen soll es in wievielen Reihen geben?
+	private int[] numberOfHumansPerCircle = {  9, 10, 11, 12, 13, 14, 15, 16, 17, 16, 15, 14, 13, 12, 11, 10, 9 };
+	//	Wieviel Abstand soll zwischen den Menschen sein
+	private int spacing = 7;
+	//	Der Kindergarten der Stadt
+	Kindergarden kindergarden = new Kindergarden( humans );
 
-	City(){	
+	private Simulation mySim;
 
-		//	Stadt mit Menschen füllen
-		//	Das war der Algorithmus, um die Menschen in Kreisen, in mehreren Kreisschichten anzuordnen
-		/*
-			for( int j = 0; j < numberOfHumansPerCircle.length; j++){
+	City( Simulation _sim ){	
 
-				//	Kreissegment für jedes Element ausrechnen
-				float deg = TWO_PI/numberOfHumansPerCircle[j];
-
-				for( int i  = 0;  i < numberOfHumansPerCircle[j]; i++){
-
-					humans.add( 
-						//	Neuer Mensch, angeordnet im Kreis
-						new Human( 
-							position.x + cos(deg  * i ) * (j+1) * spacing,  
-							position.y + sin (deg  * i )  * (j+1) * spacing
-							) 
-						);
-
-				}
-			}
-		*/
+		mySim = _sim;
 
 		//	Stadt mit Menschen füllen
 		//	Dieses Mal versuchen wir's in Hexagonraster Anordnung im Kreis
@@ -48,43 +32,68 @@ class City{
 
 					float lineSpacing = ( (humanRadius+humanRadiusExtended+spacing) * numberOfHumansPerCircle[j] )/2;
 					
-					humans.add(
-						new Human(
-							position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
-							position.y + (j * (spacing+humanRadius+humanRadiusExtended)) - lineHeight
-							)
-					);
+					if( !(j == 8 && i == 8 ) ){
+						humans.add(
+							new Human(
+								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
+								position.y + (j * (spacing+humanRadius+humanRadiusExtended)) - lineHeight,
+								_sim
+								)
+						);
+					}else{
+						humans.add(
+							new myChild(
+								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
+								position.y + (j * (spacing+humanRadius+humanRadiusExtended)) - lineHeight,
+								_sim
+								)
+						);
+					}
 
 				}
 
 			}
 
+		//	Wenn noch keine Startperson für das Virus ausgesucht wurde, wird das jetzt gemacht
+		if( !startPersonGenerated ){
+			startPerson = (int)random( 0, humans.size() ); 
+			startPersonGenerated = true;
+		}
 
-			//	hier wird ein Mensch infiziert
-			humans.get( (int)random(0, humans.size()) ).infect();
+		if( directStartMode ){
+			startInfection();
+		}
 
 	}
 
 
 	public void update(){
 
-		//	Alle Menschen updaten
-		for( int i = 0; i < humans.size(); i++ ){
-			Human h = humans.get( i );
-			h.update();
+		if( this.mySim == sim2 ){
+			kindergarden.update();
+		}
 
-			//	jetzt checken wir ob aufgrund der nähe eine ansteckung möglich wäre
-			//	und falls ja wird "der würfel gerollt"
-			for( int j = 0; j < humans.size(); j++ ){
-				Human h2 = humans.get( j );
-				if( h.inRange(h2) && h2.isInfecting() ){
+		if( currentStatus == 2 ){
 
-					if( percentChance( sim.infectionRate ) ){
-						h.infect();
+			//	Alle Menschen updaten
+			for( int i = 0; i < humans.size(); i++ ){
+				Human h = humans.get( i );
+				h.update();
+
+				//	jetzt checken wir ob aufgrund der nähe eine ansteckung möglich wäre
+				//	und falls ja wird "der würfel gerollt"
+				for( int j = 0; j < humans.size(); j++ ){
+					Human h2 = humans.get( j );
+					if( h.inRange(h2) && h2.isInfecting() ){
+
+						if( percentChance( sim.infectionRate ) ){
+							h.infect();
+						}
+
 					}
-
 				}
 			}
+
 		}
 
 	}
@@ -92,11 +101,43 @@ class City{
 
 	public void render(){
 
-		//	Alle Menschen rendern
-		for( int i = 0; i < humans.size(); i++ ){
-			Human h = humans.get( i );
-			h.render();
+		if( this.mySim == sim2 ){
+			kindergarden.render();
 		}
+
+		if( currentStatus == 2 ){
+
+			//	Alle Menschen rendern
+			for( int i = 0; i < humans.size(); i++ ){
+				Human h = humans.get( i );
+				h.render();
+			}
+
+		}
+
+	}
+
+	public void startInfection(){
+
+		//	Alle Menschen durchgehen und, falls diese Stadt Teil der rechten Simulation ist, ca 63% impfen
+		
+		if( mySim.getId() == 1 ){
+			for( int i = 0; i < humans.size(); i++ ){
+
+				Human h = humans.get( i );
+				//	Wahrscheinlichkeit, mit der ein Mensch geimpft ist
+				//	Wird nur geimpft, wenn er nicht Startpunkt des Virus ist
+				if( percentChance( 63 ) && i != startPerson ){
+
+					h.vaccinate();
+
+				}
+
+			}
+		}
+
+			//	hier wird ein Mensch infiziert
+			humans.get( startPerson ).infect();
 
 	}
 

@@ -4,25 +4,27 @@
 
 class Human{
 
-	private PVector position = new PVector( 0, 0 );
-	private float myColorRed = 0;
-	private float myColorGreen = 0;
-	private float myColorBlue = 200;
-	private float radius = 0;
-	private float radiusExtended = 0;
-	private boolean relativeToCamera = true;
+	protected PVector position = new PVector( 0, 0 );
+	protected float myColorRed = 0;
+	protected float myColorGreen = 0;
+	protected float myColorBlue = 200;
+	protected float radius = 0;
+	protected float radiusExtended = 0;
+	protected boolean relativeToCamera = true;
+	protected Simulation mySim;
 
-	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus
-	private int state = 0;
-	private Timer timer = new Timer( 10000 + random(-5000, 5000), true );
+	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus, 4: geimpft
+	protected int state = 0;
+	protected Timer timer = new Timer( 10000 + random(-5000, 5000), true );
 
 
-	Human( float posX, float posY ){
+	Human( float posX, float posY, Simulation _sim ){
 
 		position.x 		= posX;
 		position.y 		= posY;
 		radius			= humanRadius;
 		radiusExtended	= humanRadiusExtended;
+		mySim 			= _sim;
 
 	}
 
@@ -63,7 +65,6 @@ class Human{
 		}
 
 		//	Farbe einstellen, je nach Status
-
 		if(state == 0){
 			myColorRed = 0;
 			myColorGreen = 0;
@@ -80,6 +81,10 @@ class Human{
 			myColorRed = 200;
 			myColorGreen = 0;
 			myColorBlue = 0;
+		}else if(state == 4){
+			myColorRed = 0;
+			myColorGreen = 200;
+			myColorBlue = 0;
 		}
 
 	}
@@ -92,10 +97,17 @@ class Human{
 		if(relativeToCamera){
 
 			fill( myColorRed, myColorGreen, myColorBlue, 120 );
-			ellipse( position.x - sim.cam.getPosition().x, position.y - sim.cam.getPosition().y, radius+radiusExtended, radius+radiusExtended );
+			ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+				(radius+radiusExtended) * mySim.cam.getZoom(), 
+				(radius+radiusExtended) * mySim.cam.getZoom() );
 
 			fill( myColorRed, myColorGreen, myColorBlue );
-			ellipse( position.x - sim.cam.getPosition().x, position.y - sim.cam.getPosition().y, radius, radius );
+			ellipse( 
+				(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+				(radius) * mySim.cam.getZoom(), 
+				(radius) * mySim.cam.getZoom() );
 
 		}
 
@@ -139,9 +151,20 @@ class Human{
 	public void infect(){
 
 		//	es kann nur infiziert werden, wer es noch nicht ist!
+		//	bzw. wer nicht geimpft ist
 		if(this.state == 0){
 			this.state = 1;
 			timer.start();
+		}
+
+	}
+
+
+	public void vaccinate(){
+
+		//	Mensch wird geimpft, falls er es noch nicht ist.
+		if(this.state != 4){
+			this.state = 4;
 		}
 
 	}

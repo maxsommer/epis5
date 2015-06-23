@@ -5,25 +5,29 @@
 
 class Simulation{
 
-	PVector simResolution = new PVector( 0, 0 );
-	City city = new City( );
-	Caption caption = new Caption();
-	Camera cam = new Camera();
+	public int id;
+	PVector simResolution;
+	City city;
+	Camera cam;
 
 	boolean paused = false;
 
 	float infectionRange 	= 60;
 	float infectionRate 	= 0.15;
+	float vaccinationCoverage = 63;
 
 	//	Der Konstrukt erwartet zwei Parameter, die X & Y 
 	//	Auflösung mit der die Simulation laufen soll
 	//	Dadurch haben wir die Möglichkeit die Simulation selbst
 	//	innerhalb des Fensters der Applikation kleiner darstellen
 	//	zu lassen falls wir das noch benötigen sollten
-	Simulation( float resX, float resY ){
-
+	Simulation( float resX, float resY, int _id ){
+		simResolution 		= new PVector( 0, 0 );
 		simResolution.x 	= resX;
 		simResolution.y 	= resY;
+		id 			= _id;
+		city 			= new City( this );
+		cam 			= new Camera();
 
 	}
 
@@ -33,7 +37,6 @@ class Simulation{
 	public void update(){
 
 		cam.update();
-		caption.update();
 
 		if( !this.paused ){
 			city.update();
@@ -47,33 +50,14 @@ class Simulation{
 
 		city.render();
 
-		if( debugMode ){
-
-			fill( 0, 0, 230 );
-			text(frameRate+"fps", 20, 20);
-
-			if( this.paused ){
-				fill( 230, 0, 0);
-				text("Simulation is paused", 20, 40);
-
-			}else{
-				fill( 0, 230, 0 );
-				text("Simulation is running", 20, 40);
-			}
-
-			fill( 50 );
-			text("Press 'r' to restart", 20, 60);
-			text("Press 'd' to toggle debug mode", 20, 80);
-			text("Press 'p' to play/pause the simulation", 20, 100);
-
-		}
-
-		caption.render();
-
 	}
 
 	public PVector getResolution(){
 		return simResolution;
+	}
+
+	public int getId(){
+		return id;
 	}
 
 }
