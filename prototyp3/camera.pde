@@ -4,6 +4,9 @@
 
 class Camera{
 
+	//	Liste an anstehenden bewegungen und zooms
+	ArrayList<CameraTarget> cameraTargets = new ArrayList<CameraTarget>();
+
 	//	Position der Kamera, Normalerweise links oben im Koordinatensystem
 	//	Soll die Kamera bewegt werden, so setzt man mithilfe der Funktion moveTo()
 	//	diese Variable und die Kamera wird anschließend beim Updaten bewegt
@@ -27,6 +30,7 @@ class Camera{
 	//	ausgeführt werden. Deshalb gibt es hier zwei Zustandsvariablen dafür
 	private boolean isMoving 		= false;
 	private boolean isZooming		= false;
+	private boolean isSet			= false;
 	//	In diesen Variablen werden die Animationsdauern gespeichert
 	//	Beispiel: Kamera soll in 2 Sekunden von 1.0 auf 0.4 zoomen
 	//	zoomTime steht dann auf 2000
@@ -48,6 +52,23 @@ class Camera{
 		updateMove();
 		updateZoom();
 
+		println( isSet + " : isSet, " + cameraTargets.size() + " : size" );
+
+		//	Falls die Kamera gerade nicht in Bewegung ist, aber in der Warteschleife noch Bewegungen gespeichert sind
+		//	soll auf die Warteschleife zugegriffen werden
+		if( (!isMoving  || !isSet) && cameraTargets.size() > 0 ){
+
+			targetPosition = cameraTargets.get(0).getMoveTarget();
+			direction = PVector.sub( targetPosition, position );
+			targetZoom = cameraTargets.get(0).getZoomTarget();
+
+			zoomTime = cameraTargets.get(0).getTime();
+			moveTime = zoomTime;
+
+			cameraTargets.remove(0);
+
+		}
+
 	}
 
 
@@ -61,19 +82,29 @@ class Camera{
 	}
 
 
-	public void moveTo( PVector target, float _time ){
+	public void moveTo( PVector target, float _value, float _time ){
 
-		targetPosition	= target;
-		moveTime 	= _time;
-		direction = PVector.sub( targetPosition, position );
+		//	Falls die Kamera sich gerade nicht bewegt, soll sie das jetzt tun
+		//	Falls sie sich gerade bewegt, soll die Anweisung in die Warteschleife
+		//	geschoben werden, sodass sie danach ausgeführt wird.
+		if( !isSet || !isMoving ){
 
-	}
+			targetPosition = target;
+			moveTime = _time;
+			direction = PVector.sub( targetPosition, position );
 
+			targetZoom = _value;
+			zoomTime = _time;
 
-	public void zoomTo( float _value, float _time ){
+		}else if( isSet || isMoving ){
 
-		targetZoom 	= _value;
-		zoomTime 	= _time;
+			//	Neues Kameratarget in die Warteschleife
+			println( " in die warteschleife");
+			cameraTargets.add( new CameraTarget( target, _value, _time ) );
+
+		}
+
+		isSet = true;
 
 	}
 
@@ -107,6 +138,7 @@ class Camera{
 		}else{
 				movementTimer.reset();
 				isMoving = false;
+				isSet = false;
 				beforePosition = new PVector( 0,0 );
 				targetPosition = position;
 		}
@@ -117,8 +149,8 @@ class Camera{
 	private void updateZoom(){
 
 		//	Entspricht der Zoom nicht dem Zielzoom, muss gezoomt werden
-		if( targetZoom - zoom > 0.01 ){
-
+		if( abs(targetZoom - zoom) > 0.01 ){
+		
 			if( !isZooming ){
 				zoomTimer.set( zoomTime );
 				zoomTimer.start();
@@ -129,7 +161,7 @@ class Camera{
 			zoom = 		easeInOutCubic(
 								zoomTimer.getTimer(),
 								beforeZoom, 
-								targetZoom,
+								(targetZoom-beforeZoom),
 								zoomTime
 								) ;
 		}else{

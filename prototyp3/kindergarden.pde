@@ -16,9 +16,6 @@ class Kindergarden{
 
 	public void update(){
 
-		//	Wenn gerade die Kindergarten-Anzeige-Phase ist
-		if( currentStatus == 1 ){
-
 			//	es werden nur die Kindergartenkinder geupdated
 			for( int i = 0; i < humans.size(); i++ ){
 				Human h = humans.get( i );
@@ -60,14 +57,9 @@ class Kindergarden{
 
 			}
 
-		}
-
 	}
 
 	public void render(){
-
-		//	Wenn der Applikationsstatus im Kindergarten ist
-		if( currentStatus == 1 ){
 
 			//	es werden nur die Kindergartenkinder gerendert
 			for( int i = 0; i < humans.size(); i++ ){
@@ -90,7 +82,5 @@ class Kindergarden{
 			}
 
 		}
-
-	}
 
 }

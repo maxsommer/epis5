@@ -22,6 +22,7 @@ class Simulation{
 	//	innerhalb des Fensters der Applikation kleiner darstellen
 	//	zu lassen falls wir das noch benötigen sollten
 	Simulation( float resX, float resY, int _id ){
+		
 		simResolution 		= new PVector( 0, 0 );
 		simResolution.x 	= resX;
 		simResolution.y 	= resY;

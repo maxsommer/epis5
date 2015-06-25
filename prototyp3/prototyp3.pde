@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 4
+//	Prototyp 3, Version 5
 //	
 //	In Arbeit:
 //		+ Klasse Simulation
@@ -14,7 +14,6 @@
 //		+ Klasse Human
 //		+ Klasse Caption
 //		+ Klasse Camera
-//			+ Zoom
 //		+ Parallelansicht der Simulationen
 //		
 //	Zu tun:
@@ -30,14 +29,13 @@
 //		+ GUI
 //
 //	Neuerungen:
-//		+ Es gibt jetzt einen gemeinsamen Startpunkt der beiden Simulationen
-//		+ Die Animation zur Splittung der beiden Städte wird jetzt direkt automatisch abgespielt
-//		+ Es gibt jetzt die Kindergartenansicht und generell verschiedene Zustände für das Programm
-//		+ Mit 'n' kann man zwischen diesen Zuständen wechseln
+//		+ Kamerasystem ( nur noch ein befehl für 2 funktionen )
+//		+ Kamerawarteschleifen
 //
 //	Probleme:
 //		+ Die Kamera kann nicht mehrere Bewegungen in Reihenfolge nacheinander durchführen
 //		sondern springt immer direkt zum nächsten. Hier muss eine Warteschleife eingebaut werden
+//	
 
 //	Einstellungen
 //
@@ -48,13 +46,16 @@ boolean directStartMode = false;
 
 //	Globale Variablen
 
-//	0: Intro, 1: Kindergarten, 2: Simulation, 3: Outro
-int currentStatus			= 0;
+//	-1: Grundzustand, 0: Intro, 1: Kindergarten, 2: Simulation, 3: Outro
+int currentStatus			= -1;
 
 float humanRadius 			= windowResolution.y/60;
 float humanRadiusExtended 		= windowResolution.y/120;	
 boolean startPersonGenerated	= false;				//	Wurde schon eine Startperson ausgewählt?
 int startPerson 				= 0;				//	Welche ist diese Startperson?
+
+//	Testbutton für Touchtisch
+Button testbutton = new Button( new PVector(620,20), color( 230,0,0 ), color(255,0,0) );
 
 
 //	Hier wird unser Simulationsobjekt erstellt
@@ -91,17 +92,9 @@ void draw(){
 	//	bei jedem drawcall sollt zuerst einmal das Bild wieder weiß übermalt werden
 	clearScreen();
 
-	//	anschließend updaten wir unsere Simulation und lassen alles darstellen
-	sim.update();
-	sim2.update();
-	sim.render();
-	sim2.render();
-
-	//	Die Legende wird geupdatet und gerendert
-	if( currentStatus == 2 ){
-		caption.update();
-		caption.render();
-	}
+	//	mit dieser Funktion werden, je nach aktuellem Status der Applikation
+	//	die nötigen Dinge geupdated und angezeigt
+	updateStates();
 
 	//	Debuginfo rendern, falls nötig
 	renderDebugInfo();
@@ -233,21 +226,70 @@ public void changeStatus( int newstatus ){
 
 	currentStatus = newstatus;
 
+	if(currentStatus == 0){
+
+
+
+	}
+
 	if(currentStatus == 1){
 
-		//	Heranzoomen und -bewegen
-		sim2.cam.zoomTo( 0.5, 2000 );
-		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 1000 );
+		//	Heranzoomen und -bewegen	
+		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 2.0, 1000 );
+		sim2.cam.moveTo( new PVector(windowResolution.x/4*2, windowResolution.y/4*2), 1.0, 1000 );
+		sim2.cam.moveTo( new PVector(windowResolution.x/4, windowResolution.y/4), 2.0, 1000 );
+		sim2.cam.moveTo( new PVector(windowResolution.x/2.75, windowResolution.y/2.75), 4.0, 1000 );
+		sim2.cam.moveTo( new PVector(windowResolution.x/4, windowResolution.y/4), 1.0, 1000 );
 
 	}
 
 	if( currentStatus == 2 ){
 
 		//	Verschiebung der Kameras
-		sim.cam.moveTo( new PVector( -windowResolution.x/4, 0 ), 1000 );
-		sim2.cam.moveTo( new PVector( windowResolution.x/5, 0 ), 1000 );
+		sim.cam.moveTo( new PVector( -windowResolution.x/4, 0 ), 1.0, 1000 );
+		sim2.cam.moveTo( new PVector( windowResolution.x/5, 0 ), 1.0, 1000 );
+
+		sim.city.vaccinateCity();
+		sim.city.startInfection();
+		sim2.city.startInfection();	
 
 	}
+
+}
+
+
+public void updateStates(){
+
+	switch( currentStatus ){
+
+		case(0):
+		break;
+
+		case(1):
+		break;
+
+		case(2):
+		break;
+
+		case(3):
+		break;
+
+	}
+	//	anschließend updaten wir unsere Simulation und lassen alles darstellen
+	sim.update();
+	sim2.update();
+	sim.render();
+	sim2.render();
+
+	//	Die Legende wird geupdatet und gerendert
+	if( currentStatus == 2 ){
+		caption.update();
+		caption.render();
+	}
+
+	//	Button rendern
+	testbutton.update();
+	testbutton.render();
 
 }
 

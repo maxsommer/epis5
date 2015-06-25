@@ -69,7 +69,7 @@ class City{
 
 	public void update(){
 
-		if( this.mySim == sim2 ){
+		if( this.mySim == sim2 && (currentStatus == 0 || currentStatus == 1)  ){
 			kindergarden.update();
 		}
 
@@ -101,7 +101,7 @@ class City{
 
 	public void render(){
 
-		if( this.mySim == sim2 ){
+		if( this.mySim == sim2 && (currentStatus == 0 || currentStatus == 1) ){
 			kindergarden.render();
 		}
 
@@ -119,6 +119,13 @@ class City{
 
 	public void startInfection(){
 
+		//	hier wird ein Mensch infiziert
+		humans.get( startPerson ).infect();
+
+	}
+
+	public void vaccinateCity(){
+
 		//	Alle Menschen durchgehen und, falls diese Stadt Teil der rechten Simulation ist, ca 63% impfen
 		
 		if( mySim.getId() == 1 ){
@@ -135,9 +142,6 @@ class City{
 
 			}
 		}
-
-			//	hier wird ein Mensch infiziert
-			humans.get( startPerson ).infect();
 
 	}
 
