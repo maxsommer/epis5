@@ -55,7 +55,7 @@ boolean startPersonGenerated	= false;				//	Wurde schon eine Startperson ausgew√
 int startPerson 				= 0;				//	Welche ist diese Startperson?
 
 //	Testbutton f√ºr Touchtisch
-Button testbutton = new Button( new PVector(620,20), color( 230,0,0 ), color(255,0,0) );
+Button testbutton = new Button( new PVector(windowResolution.x/2-100,20), color( 230,0,0 ), color(255,0,0) );
 
 
 //	Hier wird unser Simulationsobjekt erstellt

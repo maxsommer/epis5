@@ -30,7 +30,6 @@ class Camera{
 	//	ausgeführt werden. Deshalb gibt es hier zwei Zustandsvariablen dafür
 	private boolean isMoving 		= false;
 	private boolean isZooming		= false;
-	private boolean isSet			= false;
 	//	In diesen Variablen werden die Animationsdauern gespeichert
 	//	Beispiel: Kamera soll in 2 Sekunden von 1.0 auf 0.4 zoomen
 	//	zoomTime steht dann auf 2000
@@ -52,11 +51,9 @@ class Camera{
 		updateMove();
 		updateZoom();
 
-		println( isSet + " : isSet, " + cameraTargets.size() + " : size" );
-
 		//	Falls die Kamera gerade nicht in Bewegung ist, aber in der Warteschleife noch Bewegungen gespeichert sind
 		//	soll auf die Warteschleife zugegriffen werden
-		if( (!isMoving  || !isSet) && cameraTargets.size() > 0 ){
+		if( (!isMoving  && !isZooming) && cameraTargets.size() > 0 ){
 
 			targetPosition = cameraTargets.get(0).getMoveTarget();
 			direction = PVector.sub( targetPosition, position );
@@ -84,27 +81,8 @@ class Camera{
 
 	public void moveTo( PVector target, float _value, float _time ){
 
-		//	Falls die Kamera sich gerade nicht bewegt, soll sie das jetzt tun
-		//	Falls sie sich gerade bewegt, soll die Anweisung in die Warteschleife
-		//	geschoben werden, sodass sie danach ausgeführt wird.
-		if( !isSet || !isMoving ){
-
-			targetPosition = target;
-			moveTime = _time;
-			direction = PVector.sub( targetPosition, position );
-
-			targetZoom = _value;
-			zoomTime = _time;
-
-		}else if( isSet || isMoving ){
-
-			//	Neues Kameratarget in die Warteschleife
-			println( " in die warteschleife");
-			cameraTargets.add( new CameraTarget( target, _value, _time ) );
-
-		}
-
-		isSet = true;
+		//	Neues Kameratarget in die Warteschleife
+		cameraTargets.add( new CameraTarget( target, _value, _time ) );
 
 	}
 
@@ -138,7 +116,6 @@ class Camera{
 		}else{
 				movementTimer.reset();
 				isMoving = false;
-				isSet = false;
 				beforePosition = new PVector( 0,0 );
 				targetPosition = position;
 		}
