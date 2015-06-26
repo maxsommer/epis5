@@ -56,8 +56,23 @@ class City{
 
 		//	Wenn noch keine Startperson für das Virus ausgesucht wurde, wird das jetzt gemacht
 		if( !startPersonGenerated ){
-			startPerson = (int)random( 0, humans.size() ); 
-			startPersonGenerated = true;
+			while(!startPersonGenerated){
+				startPerson = (int)random( 0, humans.size() ); 
+				int i = startPerson;
+				if( 
+						i == 60 || i == 61 || i == 62 || i == 63 ||
+						i == 74 || i == 75 || i == 76 || i == 77 || i == 78 ||
+						i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 ||
+						i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 ||
+						i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 ||
+						i == 138 || i == 139 || i == 140 || i == 141 || i == 142 ||
+						i == 153 || i == 154 || i == 155 || i == 156
+					){
+					startPersonGenerated = true;
+				}else{
+					startPersonGenerated = false;
+				}
+			}
 		}
 
 		if( directStartMode ){
@@ -118,6 +133,7 @@ class City{
 	}
 
 	public void startInfection(){
+
 
 		//	hier wird ein Mensch infiziert
 		humans.get( startPerson ).infect();

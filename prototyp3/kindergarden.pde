@@ -83,4 +83,13 @@ class Kindergarden{
 
 		}
 
+
+	public void startInfection(){
+
+		//	hier wird ein Mensch infiziert
+		humans.get( startPerson ).infect();
+		caption.infectedVisible = true;
+
+	}
+
 }

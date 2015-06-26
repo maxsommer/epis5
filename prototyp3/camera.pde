@@ -26,10 +26,13 @@ class Camera{
 	//	Der Timer wird auf einen Startwert von 2000 gesetzt und pausiert.
 	private Timer movementTimer 		= new Timer( 2000, true );
 	private Timer zoomTimer 		= new Timer( 2000, true );
+	private Timer waitTimer 		= new Timer( -1000, true );
 	//	Ist die Kamera gerade schon in Bewegung oder Zoomt schon, so soll dies zunächst 
 	//	ausgeführt werden. Deshalb gibt es hier zwei Zustandsvariablen dafür
 	private boolean isMoving 		= false;
 	private boolean isZooming		= false;
+	private boolean isWaiting		= false;
+	private boolean isPaused		= false;
 	//	In diesen Variablen werden die Animationsdauern gespeichert
 	//	Beispiel: Kamera soll in 2 Sekunden von 1.0 auf 0.4 zoomen
 	//	zoomTime steht dann auf 2000
@@ -48,19 +51,43 @@ class Camera{
 	public void update(){
 
 		updateTimers();
-		updateMove();
-		updateZoom();
+
+		if( !waitTimer.isAlive() && !isPaused ){
+
+			updateMove();
+			updateZoom();
+
+		}else{
+
+			isWaiting = false;
+
+		}
 
 		//	Falls die Kamera gerade nicht in Bewegung ist, aber in der Warteschleife noch Bewegungen gespeichert sind
 		//	soll auf die Warteschleife zugegriffen werden
-		if( (!isMoving  && !isZooming) && cameraTargets.size() > 0 ){
+		if( (!isMoving  && !isZooming && !isWaiting) && cameraTargets.size() > 0 ){
 
-			targetPosition = cameraTargets.get(0).getMoveTarget();
-			direction = PVector.sub( targetPosition, position );
-			targetZoom = cameraTargets.get(0).getZoomTarget();
+			//	Ist der nächste Auftrag keine Wartezeit
+			if( !cameraTargets.get(0).isWaitTimer() ){
 
-			zoomTime = cameraTargets.get(0).getTime();
-			moveTime = zoomTime;
+				targetPosition = cameraTargets.get(0).getMoveTarget();
+				direction = PVector.sub( targetPosition, position );
+				targetZoom = cameraTargets.get(0).getZoomTarget();
+
+				zoomTime = cameraTargets.get(0).getTime();
+				moveTime = zoomTime;
+
+			}
+
+			//	Ist der nächste Auftrag eine Wartezeit
+			if( cameraTargets.get(0).isWaitTimer() ){
+
+				waitTimer.reset();
+				waitTimer.set( cameraTargets.get(0).getTime() );
+				waitTimer.start();
+				isWaiting = true;
+
+			}
 
 			cameraTargets.remove(0);
 
@@ -84,6 +111,30 @@ class Camera{
 		//	Neues Kameratarget in die Warteschleife
 		cameraTargets.add( new CameraTarget( target, _value, _time ) );
 
+	}
+
+
+	public void wait( int _time ){
+
+		//	Neue Wartezeit in die Warteschleife einfügen
+		cameraTargets.add( new CameraTarget( _time ) );
+
+	}
+
+
+	public void pause(){
+		movementTimer.pause();
+		zoomTimer.pause();
+		waitTimer.pause();
+		isPaused = true;
+	}
+
+
+	public void resume(){
+		movementTimer.resume();
+		zoomTimer.resume();
+		waitTimer.resume();
+		isPaused = false;
 	}
 
 
@@ -113,7 +164,8 @@ class Camera{
 						beforePosition, 
 						directionNormal
 						);
-		}else{
+		}
+		else{
 				movementTimer.reset();
 				isMoving = false;
 				beforePosition = new PVector( 0,0 );
@@ -141,7 +193,8 @@ class Camera{
 								(targetZoom-beforeZoom),
 								zoomTime
 								) ;
-		}else{
+		}
+		else{
 				zoomTimer.reset();
 				isZooming = false;
 				beforeZoom = zoom;
@@ -155,6 +208,7 @@ class Camera{
 
 		movementTimer.update();
 		zoomTimer.update();
+		waitTimer.update();
 
 	}
 

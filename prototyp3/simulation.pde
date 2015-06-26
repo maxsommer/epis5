@@ -13,7 +13,7 @@ class Simulation{
 	boolean paused = false;
 
 	float infectionRange 	= 60;
-	float infectionRate 	= 0.15;
+	float infectionRate 	= 0.05;
 	float vaccinationCoverage = 63;
 
 	//	Der Konstrukt erwartet zwei Parameter, die X & Y 
@@ -36,10 +36,10 @@ class Simulation{
 	//	Die update Methode wird bei jedem Drawcall einmal aufgerufen und updated
 	//	alle Objekte in der Simulation, die GUI und die Kamera, etc.
 	public void update(){
-
+	
 		cam.update();
 
-		if( !this.paused ){
+		if( !paused ){
 			city.update();
 		}
 
@@ -59,6 +59,20 @@ class Simulation{
 
 	public int getId(){
 		return id;
+	}
+
+	public boolean isPaused(){
+		return paused;
+	}
+
+	public void pauseSim(){
+		paused = true;
+		cam.pause();
+	}
+
+	public void resumeSim(){
+		paused = false;
+		cam.resume();
 	}
 
 }

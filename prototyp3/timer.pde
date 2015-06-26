@@ -6,6 +6,9 @@
 class Timer{
 
 	private float tStart 		= 0;
+	private float tPaused 		= 0;
+	private float delta1 		= 0;
+	private float delta2 		= 0;
 	private float tNow 		= 0;
 	private float tStop		= 0;
 	private boolean paused 	= false;
@@ -53,7 +56,7 @@ class Timer{
 		//	Ist der Timer nicht pausiert, so zählt er weiter
 		if( paused == false ){
 
-			tNow = millis() - tStart;
+			tNow = millis() - tStart - tPaused;
 
 		}
 
@@ -73,11 +76,24 @@ class Timer{
 
 	public void pause(){
 		if(!paused){
+			delta1 = millis();
 			paused = true;
 		}
 	}
 
+
+	public void resume(){
+		delta2 = millis();
+		tPaused = delta2 - delta1;
+		delta2 = 0;
+		delta1 = 0;
+		paused = false;
+	}
+
 	public void reset(){
+		delta1		= 0;
+		delta2 		= 0;
+		tPaused 	= 0;
 		paused 	= true;
 		tStart		= millis();
 		tNow 		= 0;
@@ -91,7 +107,7 @@ class Timer{
 	public boolean isAlive(){
 
 		if( !infinite ){
-			if( tNow >= tStop ){
+			if( tNow > tStop ){
 				paused = true;
 				return false;
 			}

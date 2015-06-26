@@ -8,6 +8,7 @@ class Human{
 	protected float myColorRed = 0;
 	protected float myColorGreen = 0;
 	protected float myColorBlue = 200;
+	protected float myAlpha = 255;
 	protected float radius = 0;
 	protected float radiusExtended = 0;
 	protected boolean relativeToCamera = true;
@@ -65,23 +66,15 @@ class Human{
 		}
 
 		//	Farbe einstellen, je nach Status
-		if(state == 0){
+		if(state == 0){		//	Gesund
 			myColorRed = 0;
 			myColorGreen = 0;
 			myColorBlue = 200;
-		}else if(state == 1){
-			myColorRed = 0;
-			myColorGreen = 200;
-			myColorBlue = 200;
-		}else if(state == 2){
-			myColorRed = 200;
-			myColorGreen = 200;
-			myColorBlue = 0;
-		}else if(state == 3){
+		}else if(state == 1 || state == 2 || state == 3){	//	Infiziert
 			myColorRed = 200;
 			myColorGreen = 0;
 			myColorBlue = 0;
-		}else if(state == 4){
+		}else if(state == 4){	// 	Geimpft
 			myColorRed = 0;
 			myColorGreen = 200;
 			myColorBlue = 0;
@@ -96,13 +89,13 @@ class Human{
 
 		if(relativeToCamera){
 
-			fill( myColorRed, myColorGreen, myColorBlue, 120 );
+			fill( myColorRed, myColorGreen, myColorBlue, myAlpha-135 );
 			ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
 				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
 				(radius+radiusExtended) * mySim.cam.getZoom(), 
 				(radius+radiusExtended) * mySim.cam.getZoom() );
 
-			fill( myColorRed, myColorGreen, myColorBlue );
+			fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
 			ellipse( 
 				(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
 				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 

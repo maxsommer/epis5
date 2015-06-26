@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 5
+//	Prototyp 3, Version 6
 //	
 //	In Arbeit:
 //		+ Klasse Simulation
@@ -29,17 +29,25 @@
 //		+ GUI
 //
 //	Neuerungen:
-//		+ Kamerasystem ( nur noch ein befehl für 2 funktionen )
-//		+ Kamerawarteschleifen
+//		+ Reduktion der möglichen Zustände auf Gesund, Infiziert und Geimpft
+//		+ Die Legende wurde nach unten verschoben und halb-transparent hinterlegt
+//		+ Es können jetzt einzelne Elemente der Legende angezeigt werden bzw ausgeblendet werden
+//		+ Der Infektionsstart wurde jetzt auf den Kindergarten gelegt
+//		+ Die Pausieren-Funktion funktioniert jetzt korrekt
 //
 //	Probleme:
-//		+ Die Kamera kann nicht mehrere Bewegungen in Reihenfolge nacheinander durchführen
-//		sondern springt immer direkt zum nächsten. Hier muss eine Warteschleife eingebaut werden
-//	
+//		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
+//		sprich, die Simulation mit dem Kindergarten hat bereits einige Infiziert am Anfang
+//		die andere aber nur den Startpunkt
+//		
+//		+ Wird die Simulation pausiert und anschließend neu gestartet, kann es passieren
+//		dass die Pausieren Funktion anschließend nicht mehr korrekt funktioniert.
+//
 
 //	Einstellungen
 //
 PVector windowResolution = new PVector( 1440, 900 );
+int framerate = 120;
 boolean fullscreen = true;
 boolean debugMode = true;
 boolean directStartMode = false;
@@ -55,7 +63,10 @@ boolean startPersonGenerated	= false;				//	Wurde schon eine Startperson ausgew�
 int startPerson 				= 0;				//	Welche ist diese Startperson?
 
 //	Testbutton für Touchtisch
-Button testbutton = new Button( new PVector(windowResolution.x/2-100,20), color( 230,0,0 ), color(255,0,0) );
+CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 230,0,0 ), color(255,0,0), 1 );
+
+// 
+Virus testvirus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 50) ); 
 
 
 //	Hier wird unser Simulationsobjekt erstellt
@@ -77,7 +88,7 @@ void setup(){
 	//	Die Framerate wird hier auf 120 gesetzt, damit will ich erst einmal 
 	//	feststellen wie schnell die Simulation läuft. Für die finale Version reichen
 	//	auch 60 als Framerate
-	frameRate( 120 );
+	frameRate( framerate );
 	//	Damit wird das Bild etwas weicher und die Kreise nicht so eckig
 	smooth( 8 );
 	//	Ellipsenursprung im Zentrum
@@ -98,6 +109,120 @@ void draw(){
 
 	//	Debuginfo rendern, falls nötig
 	renderDebugInfo();
+
+}
+
+
+//	Der Übergang der Stati wird hier gemanaged
+//	Dadurch kann man beispielsweise für den Übergang zweier Phasen einen
+//	Zoom oder eine Kamerabewegung durchführen
+public void changeStatus( int newstatus ){
+
+	currentStatus = newstatus;
+
+	if(currentStatus == 0){
+
+
+
+	}
+
+	if(currentStatus == 1){
+
+		//	Heranzoomen und -bewegen	
+		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 2.0, 1000 );
+		sim2.cam.moveTo( new PVector(0, 0), 1.0, 1000 );
+
+		sim2.city.kindergarden.startInfection();
+
+		caption.healthyVisible = true;
+
+	}
+
+	if( currentStatus == 2 ){
+
+		//	Verschiebung der Kameras
+		sim.cam.moveTo( new PVector( -windowResolution.x/4, 0 ), 1.0, 1000 );
+		sim2.cam.moveTo( new PVector( windowResolution.x/5, 0 ), 1.0, 1000 );
+
+		sim.city.vaccinateCity();
+		sim.city.startInfection();
+		sim2.city.startInfection();	
+
+		caption.vaccinedVisible = true;
+
+	}
+
+}
+
+
+public void updateStates(){
+
+	switch( currentStatus ){
+
+		case(0):
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			testvirus.update();
+			testvirus.render();
+
+
+
+			//	Button 
+			startButton.update();
+			startButton.render();
+			//	Legende
+			caption.update();
+			caption.render();
+
+		break;
+
+		case(1):
+
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			caption.update();
+			caption.render();
+
+		break;
+
+		case(2):
+
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			caption.update();
+			caption.render();
+
+		break;
+
+		case(3):
+
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			caption.update();
+			caption.render();
+
+		break;
+
+	}
+
+}
+
+
+//	Wie der Name der Funktion schon sagt kann man hiermit die Simulationen
+//	zurücksetzen und neu starten
+public void restartSimulation(){
+
+	currentStatus = 0;
+	sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2, 1 );
+	sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
 
 }
 
@@ -148,7 +273,20 @@ public void keyPressed(){
 
 		case 'p':
 		case 'P':
-			sim.paused = !sim.paused;
+			if(!sim.isPaused()){
+				sim.pauseSim();
+			}
+			else{
+				sim.resumeSim();
+			}
+
+			if(!sim2.isPaused()){
+				sim2.pauseSim();
+			}
+			else{
+				sim2.resumeSim();
+			}
+
 		break;
 
 		case 'n':
@@ -176,7 +314,7 @@ public void renderDebugInfo(){
 			fill( 0, 0, 230 );
 			text(frameRate+"fps", 20, 20);
 
-			if( this.paused ){
+			if( sim.isPaused() && sim2.isPaused()){
 				fill( 230, 0, 0);
 				text("Simulation is paused", 20, 40);
 
@@ -215,91 +353,5 @@ public void renderDebugInfo(){
 			text("Press 'n' to switch between states", 20, 140);
 
 		}
-
-}
-
-
-//	Der Übergang der Stati wird hier gemanaged
-//	Dadurch kann man beispielsweise für den Übergang zweier Phasen einen
-//	Zoom oder eine Kamerabewegung durchführen
-public void changeStatus( int newstatus ){
-
-	currentStatus = newstatus;
-
-	if(currentStatus == 0){
-
-
-
-	}
-
-	if(currentStatus == 1){
-
-		//	Heranzoomen und -bewegen	
-		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 2.0, 1000 );
-		sim2.cam.moveTo( new PVector(windowResolution.x/4*2, windowResolution.y/4*2), 1.0, 1000 );
-		sim2.cam.moveTo( new PVector(windowResolution.x/4, windowResolution.y/4), 2.0, 1000 );
-		sim2.cam.moveTo( new PVector(windowResolution.x/2.75, windowResolution.y/2.75), 4.0, 1000 );
-		sim2.cam.moveTo( new PVector(windowResolution.x/4, windowResolution.y/4), 1.0, 1000 );
-
-	}
-
-	if( currentStatus == 2 ){
-
-		//	Verschiebung der Kameras
-		sim.cam.moveTo( new PVector( -windowResolution.x/4, 0 ), 1.0, 1000 );
-		sim2.cam.moveTo( new PVector( windowResolution.x/5, 0 ), 1.0, 1000 );
-
-		sim.city.vaccinateCity();
-		sim.city.startInfection();
-		sim2.city.startInfection();	
-
-	}
-
-}
-
-
-public void updateStates(){
-
-	switch( currentStatus ){
-
-		case(0):
-		break;
-
-		case(1):
-		break;
-
-		case(2):
-		break;
-
-		case(3):
-		break;
-
-	}
-	//	anschließend updaten wir unsere Simulation und lassen alles darstellen
-	sim.update();
-	sim2.update();
-	sim.render();
-	sim2.render();
-
-	//	Die Legende wird geupdatet und gerendert
-	if( currentStatus == 2 ){
-		caption.update();
-		caption.render();
-	}
-
-	//	Button rendern
-	testbutton.update();
-	testbutton.render();
-
-}
-
-
-//	Wie der Name der Funktion schon sagt kann man hiermit die Simulationen
-//	zurücksetzen und neu starten
-public void restartSimulation(){
-
-	currentStatus = 0;
-	sim = new Simulation( windowResolution.x, windowResolution.y, 1 );
-	sim2 = new Simulation( windowResolution.x, windowResolution.y, 2 );
 
 }

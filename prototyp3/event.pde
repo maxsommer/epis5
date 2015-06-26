@@ -8,7 +8,7 @@ class Event{
 
 	public void changeApplicationStatus( int _status ){
 
-		changeStatus( 2 );
+		changeStatus( _status );
 
 	}
 

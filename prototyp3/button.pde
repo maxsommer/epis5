@@ -4,13 +4,13 @@
 
 class Button{
 
-	private PVector position;
-	private PVector mySize;
-	private color myColor;
-	private color myColorPressed;
-	private Event myEvent;
-	private boolean pressed;
-	boolean pressedBefore = false;
+	protected PVector position;
+	protected PVector mySize;
+	protected color myColor;
+	protected color myColorPressed;
+	protected Event myEvent;
+	protected boolean pressed;
+	protected boolean pressedBefore = false;
 
 	//	Der Konstruktor erwartet eine Position, eine Farbe und ein Event
 	Button( PVector _position, color _color, color _colorpressed){
