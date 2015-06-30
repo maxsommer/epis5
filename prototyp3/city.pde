@@ -12,7 +12,7 @@ class City{
 	//	Wieviele Menschen soll es in wievielen Reihen geben?
 	private int[] numberOfHumansPerCircle = {  9, 10, 11, 12, 13, 14, 15, 16, 17, 16, 15, 14, 13, 12, 11, 10, 9 };
 	//	Wieviel Abstand soll zwischen den Menschen sein
-	private int spacing = 7;
+	private int spacing = 5;
 	//	Der Kindergarten der Stadt
 	Kindergarden kindergarden = new Kindergarden( humans );
 
@@ -150,7 +150,13 @@ class City{
 				Human h = humans.get( i );
 				//	Wahrscheinlichkeit, mit der ein Mensch geimpft ist
 				//	Wird nur geimpft, wenn er nicht Startpunkt des Virus ist
-				if( percentChance( 63 ) && i != startPerson ){
+				if( percentChance( 63 ) && i != startPerson && !( i == 60 || i == 61 || i == 62 || i == 63 ||
+						i == 74 || i == 75 || i == 76 || i == 77 || i == 78 ||
+						i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 ||
+						i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 ||
+						i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 ||
+						i == 138 || i == 139 || i == 140 || i == 141 || i == 142 ||
+						i == 153 || i == 154 || i == 155 || i == 156) ){
 
 					h.vaccinate();
 

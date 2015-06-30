@@ -47,15 +47,16 @@ class Kindergarden{
 						){
 
 							if( percentChance( sim.infectionRate ) ){
+
 								h.infect();
 								numberInfectedKindergarden++;
-								println( numberInfectedKindergarden );
 								// sobald "genügend" Kinder infiziert wurden wird zur Stadtansicht gewechselt
 								if(numberInfectedKindergardenTransition == numberInfectedKindergarden){
 
 									changeStatus( 2 );
 
 								}
+								
 							}
 
 						}

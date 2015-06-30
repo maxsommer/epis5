@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 7
+//	Prototyp 3, Version 8
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -15,13 +15,75 @@
 //		+ Automatischer Übergang zwischen Zustand 2 zu 3
 //		
 //	Zu tun:
-//		+ Realistische Werte!
-//		+ GUI
+//		+ Anpassung der Gesamtform der Stadt und des Kindergartens
+//			Es soll kein Hexagon mehr sein, da das zu viel Aufmerksamkeit auf sich zieht
+//			und möglicherweise die Nutzer verwirrt. Stattdessen soll es eine Kreisannäherung
+//			werden. 
+//	
+//		+ Anpassung der Anzahl der Menschen
+//			Aktuell gibt es 234 Menschen pro Simulation. Um beeindruckender zu wirken könnten
+//			wir die Anzahl der Menschen nochmals hochsetzen und diese stattdessen kleiner, mit 
+//			weniger Abstand darstellen
+//	
+//		+ Anpassung des Aussehens der Menschen
+//			Wir müssen eine Farbpalette bestimmen und einsetzen um sowohl differenzierbar als auch
+//			"fancy" zu sein. Dabei sollten wir auch darauf achten die Farben gerecht für Farbenblinde auszuwählen
+//
+//		+ Anpassung des Aussehens des eigenen Kindes
+//			Welche Form soll das eigene Kind haben? Das muss noch geklärt werden. Es muss eine möglichst 
+//			einfach zu differenzierende Form zu den anderen Menschen und dem Virus sein.
+//	
+//		+ Animation für den Wechsel vom Startscreen zur Kindergartenansicht
+//			Hier soll unser kleiner "Erzähler" in den Kindergarten hineinhüpfen und dann quasi
+//			das erste Kind anstecken. Von da an breitet sich die Krankheit aus
+//
+//		+ Animation der Ansteckung
+//			Ist man gesund, wird man nicht sofort und direkt komplett krank, deshalb soll es eine 
+//			Übergansanimation für jeden einzelnen Menschen geben, die den Prozess zeigt
+//			Dabei wird eine art Linie oder Welle  über den Menschen gezogen, die sich dann immer weiter über
+//			den Kreis von ihm ausbreitet
+//
+//		+ Die Impfinteraktion
+//			Hier wird auf das eigene Kind herangezoomt und man wird gefragt ob es geimpft werden soll oder eben
+//			nicht. Das entscheidet über den weiteren Verlauf der Simulation, besonders am Ende
+//
+//		+ Stopp der Simulation
+//			Unsere Simulation soll ab einem gewissen Punkt (bei Anzahl X an Infizierten) gestoppt werden
+//			dann soll sie einen kurzen Moment lang wirken und übergehen in den Erkenntnisscreen
+//			
+//		+ Animation des Erkenntnisscreens
+//			Am Ende soll unser kleiner Virus wieder kommen und nochmals versuchen einen Menschen anzustecken
+//			Wurde das eigene Kind geimpft, so versucht der kleine Virus es bei dem eigenen Kind und prallt ab. Wurde
+//			das eigene Kind nicht geimpft, so zoomen wir auf einen anderen, geimpften Menschen und lassen das Virus
+//			dort abprallen
+//			
+//		+ Realistische Werte
+//			Die Simulation beruht auf einer Ansteckrate. Das bedeutet, dass es pro Frame, der angezeigt wird immer die Chance 
+//			für jeden (der sich bei einem angesteckten in "Reichweite" befindet) gibt sich anzustecken mit Wahrscheinlichkeit X.
+//			Die echten Daten sagen Folgendes über die Ansteckrate bei Exposition:
+//				Ungeimpfte: 	95% 	- 	100%
+//				1. Geimpft: 		9%
+//				2. Geimpft: 	1% 	-	8%
+//				 
+//			Jeder Frame muss für eine echte Zeiteinheit stehen. So könnte man beispielsweise Folgendes festlegen:
+//			
+//				Die Simulation wird ca. 12 Tage abbilden
+//				1 Sekunde der Simulation soll 4 Stunden der Wirklichkeit entsprechen
+//				60 Frames / Sekunde bedeutet
+//				1 Frame = 4 Stunden/60 = 4 Minuten
+//				1 Frame entspricht also 4 Minuten
+//				Die Ansteckrate X bedeutet also eine Wahrscheinlichkeit von X, 
+//				dass eine Person innerhalb von 4 Minuten angesteckt wird
+//			
+//		+ Anzeige der aktuellen Realzeit
+//			In welcher echten Geschwindkeit breitet sich die Krankheit aus? Wir wollen das Ganze beeindruckend machen
+//			also müssen wir auch die echten Zeitdaten hierbei einblenden
 //
 //	Neuerungen:
-//		+ Übergang von Kindergarten zur Simulation funktioniert jetzt flüssig ( bei Anzahl infizierter Kinder =  x )
-//		+ Animationsfunktion für den Beispielvirus
-//		+ Einblendungseffekt für die Menschen beim Wechsel in Status 2 (Stadtansicht)
+//		+ Übernahme der Daten aus dem Kindergartenteil der Simulation
+//			Die Kinder im Kindergarten sollen alle miteinander nicht geimpft sein zum Start der beiden 
+//			Stadtsimulationen, außerdem müssen die bereits infizierten Kinder direkt übernommen werden
+//			in beide Simulationen
 //
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
@@ -155,6 +217,16 @@ public void changeStatus( int newstatus ){
 
 	if( currentStatus == 2 ){
 
+		//	Übernahme der Simulationsdaten aus dem Kindergarten
+		for( int i = 0; i < sim.city.humans.size(); i++ ){
+
+			Human h = sim2.city.humans.get(i);
+			if( h.isInfecting() ){
+				sim.city.humans.get(i).infect();
+			}
+
+		}
+
 		//	Verschiebung der Kameras
 		sim.cam.moveTo( new PVector( -windowResolution.x/4, 0 ), 1.0, 1000 );
 		sim2.cam.moveTo( new PVector( windowResolution.x/5, 0 ), 1.0, 1000 );
@@ -238,7 +310,7 @@ public void updateStates(){
 public void restartSimulation(){
 
 	virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
-	currentStatus = 0;
+	currentStatus = -1;
 	numberInfectedKindergarden = 0;
 	startPerson = 0;
 	startPersonGenerated = false;
