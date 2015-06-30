@@ -6,34 +6,22 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 6
+//	Prototyp 3, Version 7
 //	
 //	In Arbeit:
-//		+ Klasse Simulation
-//		+ Klasse City
-//		+ Klasse Human
-//		+ Klasse Caption
-//		+ Klasse Camera
-//		+ Parallelansicht der Simulationen
+//		+ Klasse Virus
+//		+ Übergansanimationen zwischen den verschiedenen Stati
+//		+ Automatischer Übergang zwischen Zustand -1 zu 0
+//		+ Automatischer Übergang zwischen Zustand 2 zu 3
 //		
 //	Zu tun:
-//		+ Klasse Simulation
-//		+ Klasse City
-//		+ Klasse Human
-//		+ Klasse Caption
-//		+ Klasse myChild
-//		+ Klasse Kindergarden
-//		+ Klasse Camera
-//		+ Simulation der Auswirkung von Impfung
 //		+ Realistische Werte!
 //		+ GUI
 //
 //	Neuerungen:
-//		+ Reduktion der möglichen Zustände auf Gesund, Infiziert und Geimpft
-//		+ Die Legende wurde nach unten verschoben und halb-transparent hinterlegt
-//		+ Es können jetzt einzelne Elemente der Legende angezeigt werden bzw ausgeblendet werden
-//		+ Der Infektionsstart wurde jetzt auf den Kindergarten gelegt
-//		+ Die Pausieren-Funktion funktioniert jetzt korrekt
+//		+ Übergang von Kindergarten zur Simulation funktioniert jetzt flüssig ( bei Anzahl infizierter Kinder =  x )
+//		+ Animationsfunktion für den Beispielvirus
+//		+ Einblendungseffekt für die Menschen beim Wechsel in Status 2 (Stadtansicht)
 //
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
@@ -61,12 +49,14 @@ float humanRadius 			= windowResolution.y/60;
 float humanRadiusExtended 		= windowResolution.y/120;	
 boolean startPersonGenerated	= false;				//	Wurde schon eine Startperson ausgewählt?
 int startPerson 				= 0;				//	Welche ist diese Startperson?
+int numberInfectedKindergarden	= 0;
+int numberInfectedKindergardenTransition = 12;
 
 //	Testbutton für Touchtisch
 CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 230,0,0 ), color(255,0,0), 1 );
 
 // 
-Virus testvirus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 50) ); 
+Virus virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
 
 
 //	Hier wird unser Simulationsobjekt erstellt
@@ -122,7 +112,31 @@ public void changeStatus( int newstatus ){
 
 	if(currentStatus == 0){
 
+		//	Hier wird die Intro Animation des Erzählervirus abespielt
+		//	Mit der Funktion moveTo kann man, wie der Name schon sagt
+		//	das Virus bewegen. 
+		//	
+		//	Die Parameter sind folgende
+		//	moveTo ( X-Position, Y-Position, Zeit, Funktion )
+		//	X-Position: 	Steht für die X-Koordinate der Zielposition
+		//	Y-Position: 	Steht für die Y-Koordinate der Zielposition
+		//	Zeit:		Wie lange soll die Animation dauern?
+		//	
+		//	Funktion:	Welche Bewegungsfunktion soll benutzt werden?
+		//			Entweder: cubic, wofür die 0 eingesetzt werden muss
+		//			Oder: exponential, wofür die 1 eingesetzt werden muss
+		//			
+		//			Man auf folgender Webseite einen guten Vergleich der beiden
+		//			Bewegungsfunktionen, die ich miteingebaut habe sehen: http://gizma.com/easing/
+		//	
+		//	Der Funktionsparameter ist optional, das heißt man muss ihn nicht unbedingt angeben, wie im Beispiel
+		//	unterhalb zu sehen ist. Gibt man ihn nicht an, wird einfach davon ausgegangen dass man die cubic Funktion
+		//	benutzen möchte.
 
+		virus.moveTo( 800, 600, 2000, 1 );
+		virus.moveTo( 900, 500, 2000, 0 );
+		virus.moveTo( 800, 600, 500 );
+		virus.moveTo( 720, 700, 500 );
 
 	}
 
@@ -130,10 +144,11 @@ public void changeStatus( int newstatus ){
 
 		//	Heranzoomen und -bewegen	
 		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 2.0, 1000 );
-		sim2.cam.moveTo( new PVector(0, 0), 1.0, 1000 );
 
+		// 	Infektion im Kindergarten beginnen
 		sim2.city.kindergarden.startInfection();
 
+		//	Die Gesunden in der Legende anzeigen 
 		caption.healthyVisible = true;
 
 	}
@@ -159,15 +174,17 @@ public void updateStates(){
 
 	switch( currentStatus ){
 
+		case(-1):
+			changeStatus(0);
+		break;
+
 		case(0):
 			sim.update();
 			sim2.update();
 			sim.render();
 			sim2.render();
-			testvirus.update();
-			testvirus.render();
-
-
+			virus.update();
+			virus.render();
 
 			//	Button 
 			startButton.update();
@@ -220,7 +237,11 @@ public void updateStates(){
 //	zurücksetzen und neu starten
 public void restartSimulation(){
 
+	virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
 	currentStatus = 0;
+	numberInfectedKindergarden = 0;
+	startPerson = 0;
+	startPersonGenerated = false;
 	sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2, 1 );
 	sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
 
