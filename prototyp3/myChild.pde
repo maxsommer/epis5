@@ -6,26 +6,41 @@ class myChild extends Human{
 
 	myChild( float posX, float posY, Simulation _sim ){
 		super( posX, posY, _sim );
+		radius 			= windowResolution.y/20;
+		radiusExtended 	= windowResolution.y/40;
 	}
 
 	public void render(){
 
 		noStroke();
 
-		if(relativeToCamera){
+		if(relativeToCamera){			
+			if( state == 4 ){
 
-			fill( myColorRed, myColorGreen, myColorBlue, 120 );
-			rect( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom() - 0.5*(radius+radiusExtended)*mySim.cam.getZoom(), 
-				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom() - 0.5*(radius+radiusExtended)*mySim.cam.getZoom(), 
-				(radius+radiusExtended) * mySim.cam.getZoom(), 
-				(radius+radiusExtended) * mySim.cam.getZoom() );
+				fill( 44, 73, 153 );
+				ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom() );
 
-			fill( myColorRed, myColorGreen, myColorBlue );
-			rect( 
-				(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom() - 0.5*(radius)*mySim.cam.getZoom(), 
-				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom() - 0.5*(radius)*mySim.cam.getZoom(), 
-				(radius) * mySim.cam.getZoom(), 
-				(radius) * mySim.cam.getZoom() );
+				fill( myColorRed, myColorGreen, myColorBlue );
+				ellipse( 
+					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+					(radius) * mySim.cam.getZoom(), 
+					(radius) * mySim.cam.getZoom() );
+
+			}
+			else{
+
+				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
+				ellipse( 
+					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom() );
+
+			}
 
 		}
 

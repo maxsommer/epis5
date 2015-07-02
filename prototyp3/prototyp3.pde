@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 8.1.3
+//	Prototyp 3, Version 9
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -23,10 +23,6 @@
 //		+ Anpassung des Aussehens der Menschen
 //			Wir müssen eine Farbpalette bestimmen und einsetzen um sowohl differenzierbar als auch
 //			"fancy" zu sein. Dabei sollten wir auch darauf achten die Farben gerecht für Farbenblinde auszuwählen
-//
-//		+ Anpassung des Aussehens des eigenen Kindes
-//			Welche Form soll das eigene Kind haben? Das muss noch geklärt werden. Es muss eine möglichst 
-//			einfach zu differenzierende Form zu den anderen Menschen und dem Virus sein.
 //	
 //		+ Animation für den Wechsel vom Startscreen zur Kindergartenansicht
 //			Hier soll unser kleiner "Erzähler" in den Kindergarten hineinhüpfen und dann quasi
@@ -66,29 +62,22 @@
 //				1 Frame entspricht also 4 Minuten
 //				Die Ansteckrate X bedeutet also eine Wahrscheinlichkeit von X, 
 //				dass eine Person innerhalb von 4 Minuten angesteckt wird
+//
+//		+ Gestaltung der Zeitleiste
+//
+//	Neuerungen:
+//		+ Anpassung des Aussehens des eigenen Kindes
+//			Welche Form soll das eigene Kind haben? Das muss noch geklärt werden. Es muss eine möglichst 
+//			einfach zu differenzierende Form zu den anderen Menschen und dem Virus sein.
+//
+//		+ Bugfix
+//			Die Übergänge von Start zu Kindergarten, sowie von Kindergarten zu Stadtansicht funktionieren
+//			jetzt korrekt. Bei Anzahl Infizierter = numberInfectedKindergarden wird in Status 2 gewechselt, bei 
+//			numberInfectedSimRight = Anzahl Infizierter wird in Status 3 gewechselt
 //			
 //		+ Anzeige der aktuellen Realzeit
 //			In welcher echten Geschwindkeit breitet sich die Krankheit aus? Wir wollen das Ganze beeindruckend machen
 //			also müssen wir auch die echten Zeitdaten hierbei einblenden
-//
-//	Neuerungen:
-//		+ Stopp der Simulation
-//			Unsere Simulation soll ab einem gewissen Punkt (bei Anzahl X an Infizierten) gestoppt werden
-//			dann soll sie einen kurzen Moment lang wirken und übergehen in den Erkenntnisscreen
-//	
-//		+ Anpassung der Gesamtform der Stadt und des Kindergartens
-//			Es soll kein Hexagon mehr sein, da das zu viel Aufmerksamkeit auf sich zieht
-//			und möglicherweise die Nutzer verwirrt. Stattdessen soll es eine Kreisannäherung
-//			werden. 
-//
-//		+ TimeDisplay (Zeitleiste)
-//
-//		+ Bild des Virus
-//
-//		+ Startbutton ist jetzt gestaltet
-//			Und er wird größer und kleiner als Anzeige, dass man touchen kann
-//
-//		+ neue Bewegungsfunktionen 
 //
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
@@ -107,29 +96,29 @@ boolean hideCursor = false;
 
 int framerate = 120;
 boolean fullscreen = true;
-boolean directStartMode = false;
 
 //	Globale Variablen
 
 //	-1: Grundzustand, 0: Intro, 1: Kindergarten, 2: Simulation, 3: Outro
 int currentStatus			= -1;
-float timeRelation			=  0.035;
+float timeRelation			=  8.4;
 //	60s = 21 tage
 // 	1s = 21/60 tage 
-//	1s = 0.35tage
-//	100ms = 0.035tage
+//	1s = 0.35 * 24h
+//	1s = 8,4h
 
-float humanRadius 			= windowResolution.y/60;
-float humanRadiusExtended 		= windowResolution.y/120;	
+float humanRadius 			= windowResolution.y/70;
+float humanRadiusExtended 		= windowResolution.y/93;	
 boolean startPersonGenerated	= false;				//	Wurde schon eine Startperson ausgewählt?
 int startPerson 				= 0;				//	Welche ist diese Startperson?
 int numberInfectedKindergarden	= 0;
 int numberInfectedKindergardenTransition = 12;
 float numberInfectedRightSim 		= 0;
-float numberInfectedRightSimTransition = 60;
+float numberInfectedRightSimTransition = 70 ;
 
 //	Testbutton für Touchtisch
 CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 1 );
+PImage playImage;
 
 // 	Virus
 Virus virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
@@ -166,7 +155,9 @@ void setup(){
 	ellipseMode(CENTER);
 	//	Schriftart laden
 	Helvetica 	= loadFont("HelveticaNeue-48.vlw");
+	//	Bilddateien laden
 	virusImage 	= loadImage("virus.png");
+	playImage 	= loadImage("play.png");
 	//	textFont( Helvetica );
 	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
 	//	sondern stattdessen lieber nichts
@@ -228,6 +219,8 @@ public void changeStatus( int newstatus ){
 	}
 
 	if(currentStatus == 1){
+
+		timeDisplay.start();
 
 		//	Heranzoomen und -bewegen	
 		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 2.0, 1000 );

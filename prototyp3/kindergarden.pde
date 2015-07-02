@@ -16,18 +16,14 @@ class Kindergarden{
 
 	public void update(){
 
+			updateInfectedKindergarden();
+
 			//	es werden nur die Kindergartenkinder geupdated
 			for( int i = 0; i < humans.size(); i++ ){
 				Human h = humans.get( i );
 
 				if( 
-					i == 60 || i == 61 || i == 62 || i == 63 ||
-					i == 74 || i == 75 || i == 76 || i == 77 || i == 78 ||
-					i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 ||
-					i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 ||
-					i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 ||
-					i == 138 || i == 139 || i == 140 || i == 141 || i == 142 ||
-					i == 153 || i == 154 || i == 155 || i == 156 
+					isInKindergarden(i)
 				){
 
 					h.update();
@@ -37,25 +33,12 @@ class Kindergarden{
 					for( int j = 0; j < humans.size(); j++ ){
 						Human h2 = humans.get( j );
 						if( h.inRange(h2) && h2.isInfecting() && 
-							(j == 60 || j == 61 || j == 62 || j == 63 ||
-							j == 74 || j == 75 || j == 76 || j == 77 || j == 78 ||
-							j == 89 || j == 90 || j == 91 || j == 92 || j == 93 || j == 94 ||
-							j == 105 || j == 106 || j == 107 || j == 108 || j == 109 || j == 110 || j == 111 ||
-							j == 122  || j == 123 || j == 124 || j == 125 || j == 126 || j == 127 ||
-							j == 138 || j == 139 || j == 140 || j == 141 || j == 142 ||
-							j == 153 || j == 154 || j == 155 || j == 156)
+							isInKindergarden(i)
 						){
 
 							if( percentChance( sim.infectionRate ) ){
 
 								h.infect();
-								numberInfectedKindergarden++;
-								// sobald "genügend" Kinder infiziert wurden wird zur Stadtansicht gewechselt
-								if(numberInfectedKindergardenTransition == numberInfectedKindergarden){
-
-									changeStatus( 2 );
-
-								}
 
 							}
 
@@ -75,13 +58,7 @@ class Kindergarden{
 				Human h = humans.get( i );
 
 				if( 
-					i == 60 || i == 61 || i == 62 || i == 63 ||
-					i == 74 || i == 75 || i == 76 || i == 77 || i == 78 ||
-					i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 ||
-					i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 ||
-					i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 ||
-					i == 138 || i == 139 || i == 140 || i == 141 || i == 142 ||
-					i == 153 || i == 154 || i == 155 || i == 156
+					isInKindergarden(i)
 				){
 
 					h.render();
@@ -90,7 +67,44 @@ class Kindergarden{
 
 			}
 
+	}
+
+
+	public void updateInfectedKindergarden(){
+
+		numberInfectedKindergarden = 0;
+
+		for( int i = 0; i < humans.size(); i++ ){
+
+			Human h = humans.get( i );
+
+			if( h.isInfecting() ){
+				numberInfectedKindergarden++;
+			}
+
 		}
+
+		if( numberInfectedKindergarden >= numberInfectedKindergardenTransition ){
+			changeStatus( 2 );
+		}
+
+	}
+
+	public boolean isInKindergarden(int i){
+		if (
+					i == 46 || i == 47 || i == 48 || i == 49 || i == 50 ||
+					i == 59 || i == 60 || i == 61 || i == 62 || i == 63 || i == 64 ||
+					i == 73 ||i == 74 || i == 75 || i == 76 || i == 77 || i == 78 || i == 79 ||
+					i == 88 ||i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 || i == 95 ||
+					i == 104 || i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 || i == 112 ||
+					i == 121 || i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 || i == 128 ||
+					i == 137 || i == 138 || i == 139 || i == 140 || i == 141 || i == 142 || i == 143 ||
+					 i == 152 || i == 153 || i == 154 || i == 155 || i == 156 || i == 157 ||
+					i == 166 || i == 167 || i == 168 || i == 169 || i == 170
+		 )
+			return true;
+		return false;
+	}
 
 
 	public void startInfection(){

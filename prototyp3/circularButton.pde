@@ -53,6 +53,7 @@ class CircularButton extends Button{
 		ellipse( position.x, position.y, radius, radius );
 		fill( 90, 90, 90, 200 );
 		ellipse( position.x, position.y, radius + 50 , radius + 50 );
+		image( playImage, position.x - (radius - 120)/2, position.y - (radius-100)/2, radius-100, radius-100 );
 
 	}
 

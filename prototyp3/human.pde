@@ -72,17 +72,17 @@ class Human{
 
 		//	Farbe einstellen, je nach Status
 		if(state == 0){		//	Gesund
-			myColorRed = 0;
-			myColorGreen = 0;
-			myColorBlue = 200;
+			myColorRed = 2;
+			myColorGreen = 191;
+			myColorBlue = 249;
 		}else if(state == 1 || state == 2 || state == 3){	//	Infiziert
-			myColorRed = 200;
-			myColorGreen = 0;
-			myColorBlue = 0;
+			myColorRed = 239;
+			myColorGreen = 42;
+			myColorBlue = 22;
 		}else if(state == 4){	// 	Geimpft
-			myColorRed = 0;
-			myColorGreen = 200;
-			myColorBlue = 0;
+			myColorRed = 2;
+			myColorGreen = 191;
+			myColorBlue = 249;
 		}
 
 	}
@@ -94,28 +94,66 @@ class Human{
 
 		if(relativeToCamera){
 
-			fill( myColorRed, myColorGreen, myColorBlue, myAlpha-135 );
-			ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
-				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
-				(radius+radiusExtended) * mySim.cam.getZoom(), 
-				(radius+radiusExtended) * mySim.cam.getZoom() );
+			if( state == 4 ){
 
-			fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
-			ellipse( 
-				(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
-				(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
-				(radius) * mySim.cam.getZoom(), 
-				(radius) * mySim.cam.getZoom() );
+				fill( 44, 73, 153 );
+				ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom() );
+
+				fill( myColorRed, myColorGreen, myColorBlue );
+				ellipse( 
+					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+					(radius) * mySim.cam.getZoom(), 
+					(radius) * mySim.cam.getZoom() );
+
+			}
+			else{
+
+				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
+				ellipse( 
+					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom(), 
+					(radius+radiusExtended) * mySim.cam.getZoom() );
+
+			}
 
 		}
 
 		if(!relativeToCamera){
 
-			fill( myColorRed, myColorGreen, myColorBlue, 120 );
-			ellipse( position.x, position.y , radius+radiusExtended, radius+radiusExtended );
+			if( state == 4 ){
 
-			fill( myColorRed, myColorGreen, myColorBlue );
-			ellipse( position.x, position.y, radius, radius );
+				fill( 44, 73, 153 );
+				ellipse( (position.x), 
+					(position.y), 
+					(radius+radiusExtended), 
+					(radius+radiusExtended)
+					);
+
+				fill( myColorRed, myColorGreen, myColorBlue );
+				ellipse( 
+					(position.x), 
+					(position.y), 
+					(radius), 
+					(radius)
+					);
+
+			}
+			else{
+
+				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
+				ellipse( 
+					(position.x), 
+					(position.y), 
+					(radius+radiusExtended), 
+					(radius+radiusExtended)
+					);
+
+			}
 			
 		}
 
@@ -143,6 +181,11 @@ class Human{
 
 		return false;
 
+	}
+
+
+	public void setPosition( PVector _pos ){
+		position = _pos;
 	}
 
 

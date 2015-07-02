@@ -12,7 +12,7 @@ class City{
 	//	Wieviele Menschen soll es in wievielen Reihen geben?
 	private int[] numberOfHumansPerCircle = {  9, 10, 11, 12, 13, 14, 15, 16, 17, 16, 15, 14, 13, 12, 11, 10, 9 };
 	//	Wieviel Abstand soll zwischen den Menschen sein
-	private int spacing = 7;
+	private int spacing = 10;
 	//	Der Kindergarten der Stadt
 	Kindergarden kindergarden = new Kindergarden( humans );
 
@@ -32,7 +32,7 @@ class City{
 
 					float lineSpacing = ( (humanRadius+humanRadiusExtended+spacing) * numberOfHumansPerCircle[j] )/2;
 					
-					if( !(j == 8 && i == 8 ) ){
+					if( !(j == 7 && i == 7 ) ){
 						humans.add(
 							new Human(
 								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
@@ -54,19 +54,20 @@ class City{
 
 			}
 
+		humans.get(75).setPosition( new PVector( 5000, 5000 ) );
+		humans.get(76).setPosition( new PVector( 5000, 5000 ) );
+		humans.get(90).setPosition( new PVector( 5000, 5000 ) );
+		humans.get(92).setPosition( new PVector( 5000, 5000 ) );
+		humans.get(107).setPosition( new PVector( 5000, 5000 ) );
+		humans.get(108).setPosition( new PVector( 5000, 5000 ) );
+
 		//	Wenn noch keine Startperson für das Virus ausgesucht wurde, wird das jetzt gemacht
 		if( !startPersonGenerated ){
 			while(!startPersonGenerated){
 				startPerson = (int)random( 0, humans.size() ); 
 				int i = startPerson;
 				if( 
-						i == 60 || i == 61 || i == 62 || i == 63 ||
-						i == 74 || i == 75 || i == 76 || i == 77 || i == 78 ||
-						i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 ||
-						i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 ||
-						i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 ||
-						i == 138 || i == 139 || i == 140 || i == 141 || i == 142 ||
-						i == 153 || i == 154 || i == 155 || i == 156
+						kindergarden.isInKindergarden(i)
 					){
 					startPersonGenerated = true;
 				}else{
@@ -75,14 +76,12 @@ class City{
 			}
 		}
 
-		if( directStartMode ){
-			startInfection();
-		}
-
 	}
 
 
 	public void update(){
+
+		updateNumberInfectedRight();
 
 		if( this.mySim == sim2 && (currentStatus == 1)  ){
 			kindergarden.update();
@@ -99,22 +98,11 @@ class City{
 				//	und falls ja wird "der würfel gerollt"
 				for( int j = 0; j < humans.size(); j++ ){
 					Human h2 = humans.get( j );
-					if( h.inRange(h2) && h2.isInfecting() ){
+					if( h.inRange(h2) && h2.isInfecting() && !h.isInfecting() ){
 
 						if( percentChance( sim.infectionRate ) ){
 
 							h.infect();
-
-							//	Hier wird mitgezählt wieviele Leute schon infiziert sind insgesamt,
-							//	damit bei einer bestimmten Anzahl
-							if( mySim == sim ){
-								numberInfectedRightSim++;
-							}
-							//	Sobald "genügend" Leute gesamt erkrankt sind, wird die Simulation in die
-							//	nächste Phase gebracht
-							if( numberInfectedRightSim == numberInfectedRightSimTransition ){
-								changeStatus( 3 );
-							}
 
 						}
 
@@ -145,8 +133,33 @@ class City{
 
 	}
 
-	public void startInfection(){
 
+	public void updateNumberInfectedRight(){
+
+		numberInfectedRightSim = 0;
+		//	Wenn diese Simulation die rechte ist dann
+		//	alle Leute durchgehen und schauen wieviele
+		//	infiziert sind. Sind so viele, oder mehr infiziert
+		//	wie für den Übergang in die nächste Phase nötig sind
+		//	so soll das jetzt passieren
+		if( mySim.getId()  == 1 ){
+
+			for( int i = 0; i < humans.size(); i++ ){
+				Human h = humans.get( i );
+
+				if( h.isInfecting() ){
+					numberInfectedRightSim++;
+				}
+			}
+
+			if( numberInfectedRightSim >= numberInfectedRightSimTransition )
+				changeStatus( 3 );
+
+		}
+
+	}
+
+	public void startInfection(){
 
 		//	hier wird ein Mensch infiziert
 		humans.get( startPerson ).infect();
@@ -156,20 +169,13 @@ class City{
 	public void vaccinateCity(){
 
 		//	Alle Menschen durchgehen und, falls diese Stadt Teil der rechten Simulation ist, ca 63% impfen
-		
 		if( mySim.getId() == 1 ){
 			for( int i = 0; i < humans.size(); i++ ){
 
 				Human h = humans.get( i );
 				//	Wahrscheinlichkeit, mit der ein Mensch geimpft ist
 				//	Wird nur geimpft, wenn er nicht Startpunkt des Virus ist
-				if( percentChance( 63 ) && i != startPerson && !( i == 60 || i == 61 || i == 62 || i == 63 ||
-						i == 74 || i == 75 || i == 76 || i == 77 || i == 78 ||
-						i == 89 || i == 90 || i == 91 || i == 92 || i == 93 || i == 94 ||
-						i == 105 || i == 106 || i == 107 || i == 108 || i == 109 || i == 110 || i == 111 ||
-						i == 122  || i == 123 || i == 124 || i == 125 || i == 126 || i == 127 ||
-						i == 138 || i == 139 || i == 140 || i == 141 || i == 142 ||
-						i == 153 || i == 154 || i == 155 || i == 156) ){
+				if( percentChance( 63 ) && i != startPerson && !kindergarden.isInKindergarden( i ) ){
 
 					h.vaccinate();
 
