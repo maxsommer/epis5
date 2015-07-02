@@ -122,13 +122,13 @@ class Virus{
 	}
 
 
-	public void moveTo( int _x, int _y, float _time ){
+	public void moveTo( float _x, float _y, float _time ){
 
 		moveList.add( new VirusTarget( new PVector(_x,_y), _time, 0 ) );
 
 	}
 
-	public void moveTo( int _x, int _y, float _time, int _animationType ){
+	public void moveTo( float _x, float _y, float _time, int _animationType ){
 
 		moveList.add( new VirusTarget( new PVector(_x,_y), _time, _animationType ) );
 

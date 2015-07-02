@@ -5,6 +5,7 @@
 class Human{
 
 	protected PVector position = new PVector( 0, 0 );
+	protected PVector positionAlteration = new PVector( 0, 0 );
 	protected float myColorRed = 0;
 	protected float myColorGreen = 0;
 	protected float myColorBlue = 200;
@@ -23,6 +24,11 @@ class Human{
 
 		position.x 		= posX;
 		position.y 		= posY;
+		positionAlteration.x 	= noise( position.x, position.y );
+		positionAlteration.y 	= noise( position.y, position.x );
+		position.x 		+= positionAlteration.x * 25 ;
+		position.y 		+= positionAlteration.y * 25;
+		println( positionAlteration.x + " " + positionAlteration.y );
 		radius			= humanRadius;
 		radiusExtended	= humanRadiusExtended;
 		mySim 			= _sim;

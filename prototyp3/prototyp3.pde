@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 8
+//	Prototyp 3, Version 8.1
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -15,13 +15,8 @@
 //		+ Automatischer Übergang zwischen Zustand 2 zu 3
 //		
 //	Zu tun:
-//		+ Anpassung der Gesamtform der Stadt und des Kindergartens
-//			Es soll kein Hexagon mehr sein, da das zu viel Aufmerksamkeit auf sich zieht
-//			und möglicherweise die Nutzer verwirrt. Stattdessen soll es eine Kreisannäherung
-//			werden. 
-//	
 //		+ Anpassung der Anzahl der Menschen
-//			Aktuell gibt es 234 Menschen pro Simulation. Um beeindruckender zu wirken könnten
+//			Aktuell gibt es 217 Menschen pro Simulation. Um beeindruckender zu wirken könnten
 //			wir die Anzahl der Menschen nochmals hochsetzen und diese stattdessen kleiner, mit 
 //			weniger Abstand darstellen
 //	
@@ -47,9 +42,6 @@
 //			Hier wird auf das eigene Kind herangezoomt und man wird gefragt ob es geimpft werden soll oder eben
 //			nicht. Das entscheidet über den weiteren Verlauf der Simulation, besonders am Ende
 //
-//		+ Stopp der Simulation
-//			Unsere Simulation soll ab einem gewissen Punkt (bei Anzahl X an Infizierten) gestoppt werden
-//			dann soll sie einen kurzen Moment lang wirken und übergehen in den Erkenntnisscreen
 //			
 //		+ Animation des Erkenntnisscreens
 //			Am Ende soll unser kleiner Virus wieder kommen und nochmals versuchen einen Menschen anzustecken
@@ -80,10 +72,16 @@
 //			also müssen wir auch die echten Zeitdaten hierbei einblenden
 //
 //	Neuerungen:
-//		+ Übernahme der Daten aus dem Kindergartenteil der Simulation
-//			Die Kinder im Kindergarten sollen alle miteinander nicht geimpft sein zum Start der beiden 
-//			Stadtsimulationen, außerdem müssen die bereits infizierten Kinder direkt übernommen werden
-//			in beide Simulationen
+//		+ Stopp der Simulation
+//			Unsere Simulation soll ab einem gewissen Punkt (bei Anzahl X an Infizierten) gestoppt werden
+//			dann soll sie einen kurzen Moment lang wirken und übergehen in den Erkenntnisscreen
+//	
+//		+ Anpassung der Gesamtform der Stadt und des Kindergartens
+//			Es soll kein Hexagon mehr sein, da das zu viel Aufmerksamkeit auf sich zieht
+//			und möglicherweise die Nutzer verwirrt. Stattdessen soll es eine Kreisannäherung
+//			werden. 
+//
+//		+ TimeDisplay (Zeitleiste)
 //
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
@@ -96,9 +94,11 @@
 
 //	Einstellungen
 //
+boolean presentationMode = false;
 PVector windowResolution = new PVector( 1440, 900 );
 int framerate = 120;
 boolean fullscreen = true;
+boolean hideCursor = false;
 boolean debugMode = true;
 boolean directStartMode = false;
 
@@ -113,12 +113,18 @@ boolean startPersonGenerated	= false;				//	Wurde schon eine Startperson ausgew�
 int startPerson 				= 0;				//	Welche ist diese Startperson?
 int numberInfectedKindergarden	= 0;
 int numberInfectedKindergardenTransition = 12;
+float numberInfectedRightSim 		= 0;
+float numberInfectedRightSimTransition = 60;
 
 //	Testbutton für Touchtisch
 CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 230,0,0 ), color(255,0,0), 1 );
 
-// 
+// 	Virus
 Virus virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
+
+//	TimeDisplay
+TimeDisplay timeDisplay = new TimeDisplay();
+PFont Helvetica;
 
 
 //	Hier wird unser Simulationsobjekt erstellt
@@ -133,6 +139,14 @@ Caption caption = new Caption();
 
 void setup(){
 
+	//	Falls der Präsentationsmodus aktiviert ist, wird die Bildschirmauflösung auf
+	//	Full HD (1080p) gesetzt, der Cursor wird deaktiviert und der Debugmodus ebenfalls
+	if( presentationMode ){
+		windowResolution 	= new PVector ( 1920, 1080 );
+		hideCursor 		= true;
+		debugMode		= false;
+	}
+
 	//	Fenstergröße setzen
 	size( (int)windowResolution.x , (int)windowResolution.y, P2D );
 	//	Bildschirm Hintergrund weiß malen
@@ -145,6 +159,14 @@ void setup(){
 	smooth( 8 );
 	//	Ellipsenursprung im Zentrum
 	ellipseMode(CENTER);
+	//	Schriftart laden
+	Helvetica = loadFont("HelveticaNeue-48.vlw");
+	//textFont( Helvetica );
+	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
+	//	sondern stattdessen lieber nichts
+	if(hideCursor){
+		noCursor();
+	}
 
 }
 
@@ -195,10 +217,10 @@ public void changeStatus( int newstatus ){
 		//	unterhalb zu sehen ist. Gibt man ihn nicht an, wird einfach davon ausgegangen dass man die cubic Funktion
 		//	benutzen möchte.
 
-		virus.moveTo( 800, 600, 2000, 1 );
-		virus.moveTo( 900, 500, 2000, 0 );
-		virus.moveTo( 800, 600, 500 );
-		virus.moveTo( 720, 700, 500 );
+		virus.moveTo( windowResolution.x/2 + 80, windowResolution.y/2 + 150, 2000, 1 );
+		virus.moveTo( windowResolution.x/2 + 180, windowResolution.y/2 + 50, 2000, 0 );
+		virus.moveTo( windowResolution.x/2 + 80, windowResolution.y/2 + 150, 500 );
+		virus.moveTo( windowResolution.x/2, windowResolution.y/2 + 250, 500 );
 
 	}
 
@@ -275,6 +297,9 @@ public void updateStates(){
 			sim2.render();
 			caption.update();
 			caption.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
 
 		break;
 
@@ -286,6 +311,9 @@ public void updateStates(){
 			sim2.render();
 			caption.update();
 			caption.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
 
 		break;
 
@@ -297,6 +325,9 @@ public void updateStates(){
 			sim2.render();
 			caption.update();
 			caption.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
 
 		break;
 
@@ -310,6 +341,7 @@ public void updateStates(){
 public void restartSimulation(){
 
 	virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
+	timeDisplay = new TimeDisplay();
 	currentStatus = -1;
 	numberInfectedKindergarden = 0;
 	startPerson = 0;

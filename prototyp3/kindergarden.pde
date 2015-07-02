@@ -56,7 +56,7 @@ class Kindergarden{
 									changeStatus( 2 );
 
 								}
-								
+
 							}
 
 						}

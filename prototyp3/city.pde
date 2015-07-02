@@ -12,7 +12,7 @@ class City{
 	//	Wieviele Menschen soll es in wievielen Reihen geben?
 	private int[] numberOfHumansPerCircle = {  9, 10, 11, 12, 13, 14, 15, 16, 17, 16, 15, 14, 13, 12, 11, 10, 9 };
 	//	Wieviel Abstand soll zwischen den Menschen sein
-	private int spacing = 5;
+	private int spacing = 7;
 	//	Der Kindergarten der Stadt
 	Kindergarden kindergarden = new Kindergarden( humans );
 
@@ -102,7 +102,20 @@ class City{
 					if( h.inRange(h2) && h2.isInfecting() ){
 
 						if( percentChance( sim.infectionRate ) ){
+
 							h.infect();
+
+							//	Hier wird mitgezählt wieviele Leute schon infiziert sind insgesamt,
+							//	damit bei einer bestimmten Anzahl
+							if( mySim == sim ){
+								numberInfectedRightSim++;
+							}
+							//	Sobald "genügend" Leute gesamt erkrankt sind, wird die Simulation in die
+							//	nächste Phase gebracht
+							if( numberInfectedRightSim == numberInfectedRightSimTransition ){
+								changeStatus( 3 );
+							}
+
 						}
 
 					}
@@ -120,7 +133,7 @@ class City{
 			kindergarden.render();
 		}
 
-		if( currentStatus == 2 ){
+		if( currentStatus == 2 || currentStatus == 3 ){
 
 			//	Alle Menschen rendern
 			for( int i = 0; i < humans.size(); i++ ){
