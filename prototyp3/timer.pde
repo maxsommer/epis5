@@ -13,6 +13,7 @@ class Timer{
 	private float tStop		= 0;
 	private boolean paused 	= false;
 	private boolean infinite 	= true;
+	private boolean completed 	= false;
 
 
 	//	Dieser Konstruktor ist der Standardkonstruktor
@@ -98,6 +99,7 @@ class Timer{
 		tStart		= millis();
 		tNow 		= 0;
 		tStop		= 0;
+		completed	= false;
 	}
 
 	public void set(float fTime){
@@ -109,6 +111,7 @@ class Timer{
 		if( !infinite ){
 			if( tNow > tStop ){
 				paused = true;
+				completed = true;
 				return false;
 			}
 		}

@@ -50,10 +50,26 @@ class CircularButton extends Button{
 		}else{
 			fill( myColor );
 		}
-		ellipse( position.x, position.y, radius, radius );
+		ellipse( 
+			position.x - sim2.cam.getPosition().x, 
+			position.y - sim2.cam.getPosition().y, 
+			radius, 
+			radius 
+			);
 		fill( 90, 90, 90, 200 );
-		ellipse( position.x, position.y, radius + 50 , radius + 50 );
-		image( playImage, position.x - (radius - 120)/2, position.y - (radius-100)/2, radius-100, radius-100 );
+		ellipse( 
+			position.x - sim2.cam.getPosition().x, 
+			position.y - sim2.cam.getPosition().y, 
+			radius + 50 , 
+			radius + 50 
+			);
+		image( 
+			playImage, 
+			position.x - (radius - 120)/2 - sim2.cam.getPosition().x, 
+			position.y - (radius-100)/2 - sim2.cam.getPosition().y, 
+			radius-100, 
+			radius-100 
+			);
 
 	}
 

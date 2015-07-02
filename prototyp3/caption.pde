@@ -9,8 +9,8 @@ class Caption{
 	boolean vaccinedVisible = false;
 
 	Human h1 = new Human( windowResolution.x / 7 * 2.4, windowResolution.y - 30, false );
-	Human h2 = new Human( windowResolution.x / 7 * 3.4, windowResolution.y - 30, false );
-	Human h5 = new Human( windowResolution.x / 7 * 4.4, windowResolution.y - 30, false );
+	Human h2 = new Human( windowResolution.x / 7 * 4.4, windowResolution.y - 30, false );
+	Human h5 = new Human( windowResolution.x / 7 * 3.4, windowResolution.y - 30, false );
 
 	Caption(){
 

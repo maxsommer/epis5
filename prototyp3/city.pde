@@ -35,7 +35,7 @@ class City{
 					if( !(j == 7 && i == 7 ) ){
 						humans.add(
 							new Human(
-								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
+								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing + rightTransitionOffset,
 								position.y + (j * (spacing+humanRadius+humanRadiusExtended)) - lineHeight,
 								_sim
 								)
@@ -43,7 +43,7 @@ class City{
 					}else{
 						humans.add(
 							new myChild(
-								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing,
+								position.x + (i * (spacing+humanRadius+humanRadiusExtended)) - lineSpacing+ rightTransitionOffset,
 								position.y + (j * (spacing+humanRadius+humanRadiusExtended)) - lineHeight,
 								_sim
 								)
@@ -117,7 +117,7 @@ class City{
 
 	public void render(){
 
-		if( this.mySim == sim2 && (currentStatus == 1) ){
+		if( this.mySim == sim2 && (currentStatus == 1 || currentStatus == 6) ){
 			kindergarden.render();
 		}
 

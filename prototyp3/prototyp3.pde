@@ -6,7 +6,22 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 9
+//	Prototyp 3, Version 9.1
+//
+//	Ablauf der Stati:
+//		-1: 	Starten der Applikation
+//		0: 	Startscreen
+//		1: 	Kindergarten
+//		2:	Städte
+//		3: 	Erkenntnis
+//		4: 	Neustart der Simulation
+//		5:	
+//		6: 	Übergang Startscreen zu Kindergarten
+//				Virus bewegt sich zum Kindergarten und steckt jemanden an
+//		7:	Vorstellung des eigenen Kindes 
+//				Zoom auf das Kind
+//				"Das ist dein Kind"
+//		8: 	Übergang Kindergarten zu Stadt
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -15,14 +30,13 @@
 //		+ Automatischer Übergang zwischen Zustand 2 zu 3
 //		
 //	Zu tun:
+//		+ Sound
+//			Die Simulation brauch auch noch Sounds!
+//	
 //		+ Anpassung der Anzahl der Menschen
 //			Aktuell gibt es 217 Menschen pro Simulation. Um beeindruckender zu wirken könnten
 //			wir die Anzahl der Menschen nochmals hochsetzen und diese stattdessen kleiner, mit 
 //			weniger Abstand darstellen
-//	
-//		+ Anpassung des Aussehens der Menschen
-//			Wir müssen eine Farbpalette bestimmen und einsetzen um sowohl differenzierbar als auch
-//			"fancy" zu sein. Dabei sollten wir auch darauf achten die Farben gerecht für Farbenblinde auszuwählen
 //	
 //		+ Animation für den Wechsel vom Startscreen zur Kindergartenansicht
 //			Hier soll unser kleiner "Erzähler" in den Kindergarten hineinhüpfen und dann quasi
@@ -38,7 +52,6 @@
 //			Hier wird auf das eigene Kind herangezoomt und man wird gefragt ob es geimpft werden soll oder eben
 //			nicht. Das entscheidet über den weiteren Verlauf der Simulation, besonders am Ende
 //
-//			
 //		+ Animation des Erkenntnisscreens
 //			Am Ende soll unser kleiner Virus wieder kommen und nochmals versuchen einen Menschen anzustecken
 //			Wurde das eigene Kind geimpft, so versucht der kleine Virus es bei dem eigenen Kind und prallt ab. Wurde
@@ -66,24 +79,15 @@
 //		+ Gestaltung der Zeitleiste
 //
 //	Neuerungen:
-//		+ Anpassung des Aussehens des eigenen Kindes
-//			Welche Form soll das eigene Kind haben? Das muss noch geklärt werden. Es muss eine möglichst 
-//			einfach zu differenzierende Form zu den anderen Menschen und dem Virus sein.
+//		+ Anpassung des Aussehens der Menschen
+//			Wir müssen eine Farbpalette bestimmen und einsetzen um sowohl differenzierbar als auch
+//			"fancy" zu sein. Dabei sollten wir auch darauf achten die Farben gerecht für Farbenblinde auszuwählen
 //
-//		+ Bugfix
-//			Die Übergänge von Start zu Kindergarten, sowie von Kindergarten zu Stadtansicht funktionieren
-//			jetzt korrekt. Bei Anzahl Infizierter = numberInfectedKindergarden wird in Status 2 gewechselt, bei 
-//			numberInfectedSimRight = Anzahl Infizierter wird in Status 3 gewechselt
-//			
-//		+ Anzeige der aktuellen Realzeit
-//			In welcher echten Geschwindkeit breitet sich die Krankheit aus? Wir wollen das Ganze beeindruckend machen
-//			also müssen wir auch die echten Zeitdaten hierbei einblenden
+//		+ Play Button
+//		+ Übergangsanimationen
+//		
 //
 //	Probleme:
-//		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
-//		sprich, die Simulation mit dem Kindergarten hat bereits einige Infiziert am Anfang
-//		die andere aber nur den Startpunkt
-//		
 //		+ Wird die Simulation pausiert und anschließend neu gestartet, kann es passieren
 //		dass die Pausieren Funktion anschließend nicht mehr korrekt funktioniert.
 //
@@ -115,9 +119,11 @@ int numberInfectedKindergarden	= 0;
 int numberInfectedKindergardenTransition = 12;
 float numberInfectedRightSim 		= 0;
 float numberInfectedRightSimTransition = 70 ;
+Timer simulationPauseTimer		= new Timer( 1500, true );
+float rightTransitionOffset 		= windowResolution.x;
 
 //	Testbutton für Touchtisch
-CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 1 );
+CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 6 );
 PImage playImage;
 
 // 	Virus
@@ -174,6 +180,10 @@ void draw(){
 	//	bei jedem drawcall sollt zuerst einmal das Bild wieder weiß übermalt werden
 	clearScreen();
 
+	//	auch im Hauptprogramm werden Timer benötigt.
+	//	diese werden hier geupdatet
+	updateTimers();
+
 	//	mit dieser Funktion werden, je nach aktuellem Status der Applikation
 	//	die nötigen Dinge geupdated und angezeigt
 	updateStates();
@@ -223,7 +233,7 @@ public void changeStatus( int newstatus ){
 		timeDisplay.start();
 
 		//	Heranzoomen und -bewegen	
-		sim2.cam.moveTo( new PVector(windowResolution.x/4,windowResolution.y/4), 2.0, 1000 );
+		sim2.cam.moveTo( new PVector(windowResolution.x/4*5,windowResolution.y/4), 2.0, 1000 );
 
 		// 	Infektion im Kindergarten beginnen
 		sim2.city.kindergarden.startInfection();
@@ -234,6 +244,9 @@ public void changeStatus( int newstatus ){
 	}
 
 	if( currentStatus == 2 ){
+
+		sim.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
+		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
 
 		//	Übernahme der Simulationsdaten aus dem Kindergarten
 		for( int i = 0; i < sim.city.humans.size(); i++ ){
@@ -246,14 +259,35 @@ public void changeStatus( int newstatus ){
 		}
 
 		//	Verschiebung der Kameras
-		sim.cam.moveTo( new PVector( -windowResolution.x/4, 0 ), 1.0, 1000 );
-		sim2.cam.moveTo( new PVector( windowResolution.x/5, 0 ), 1.0, 1000 );
+		sim.cam.moveTo( new PVector( windowResolution.x/4*3, 0 ), 1.0, 1500 );
+		sim2.cam.moveTo( new PVector( windowResolution.x/5*6, 0 ), 1.0, 1500 );
 
 		sim.city.vaccinateCity();
 		sim.city.startInfection();
 		sim2.city.startInfection();	
 
 		caption.vaccinedVisible = true;
+
+	}
+
+	if( currentStatus == 6 ){
+
+		// Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
+		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2500 );
+		simulationPauseTimer.reset();
+		simulationPauseTimer.set( 2500 );
+		simulationPauseTimer.start();
+
+	}
+
+}
+
+
+public void updateTimers(){
+
+	simulationPauseTimer.update();
+
+	if( !simulationPauseTimer.isAlive() ){
 
 	}
 
@@ -339,6 +373,32 @@ public void updateStates(){
 			//	Zeitleiste
 			timeDisplay.update();
 			timeDisplay.render();
+
+		break;
+
+		case(6):
+		
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			caption.update();
+			caption.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
+
+			if( !virus.hasInQueue() ){
+				playStartScreenAnimation();
+			}
+
+			//	Button 
+			startButton.update();
+			startButton.render();
+
+			if( simulationPauseTimer.completed ){
+				changeStatus( 1 );
+			}
 
 		break;
 
