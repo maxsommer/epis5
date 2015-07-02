@@ -84,7 +84,7 @@ class City{
 
 	public void update(){
 
-		if( this.mySim == sim2 && (currentStatus == 0 || currentStatus == 1)  ){
+		if( this.mySim == sim2 && (currentStatus == 1)  ){
 			kindergarden.update();
 		}
 
@@ -129,7 +129,7 @@ class City{
 
 	public void render(){
 
-		if( this.mySim == sim2 && (currentStatus == 0 || currentStatus == 1) ){
+		if( this.mySim == sim2 && (currentStatus == 1) ){
 			kindergarden.render();
 		}
 

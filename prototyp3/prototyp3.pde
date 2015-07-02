@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 8.1.1
+//	Prototyp 3, Version 8.1.2
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -85,6 +85,9 @@
 //
 //		+ Bild des Virus
 //
+//		+ Startbutton ist jetzt gestaltet
+//			Und er wird größer und kleiner als Anzeige, dass man touchen kann
+//
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
 //		sprich, die Simulation mit dem Kindergarten hat bereits einige Infiziert am Anfang
@@ -96,12 +99,12 @@
 
 //	Einstellungen
 //
-boolean presentationMode = false;
 PVector windowResolution = new PVector( 1440, 900 );
+boolean debugMode = true;
+boolean hideCursor = false;
+
 int framerate = 120;
 boolean fullscreen = true;
-boolean hideCursor = false;
-boolean debugMode = true;
 boolean directStartMode = false;
 
 //	Globale Variablen
@@ -119,7 +122,7 @@ float numberInfectedRightSim 		= 0;
 float numberInfectedRightSimTransition = 60;
 
 //	Testbutton für Touchtisch
-CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 230,0,0 ), color(255,0,0), 1 );
+CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 1 );
 
 // 	Virus
 Virus virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
@@ -141,14 +144,6 @@ Caption caption = new Caption();
 
 
 void setup(){
-
-	//	Falls der Präsentationsmodus aktiviert ist, wird die Bildschirmauflösung auf
-	//	Full HD (1080p) gesetzt, der Cursor wird deaktiviert und der Debugmodus ebenfalls
-	if( presentationMode ){
-		windowResolution 	= new PVector ( 1920, 1080 );
-		hideCursor 		= true;
-		debugMode		= false;
-	}
 
 	//	Fenstergröße setzen
 	size( (int)windowResolution.x , (int)windowResolution.y, P2D );

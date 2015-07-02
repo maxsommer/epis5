@@ -5,25 +5,30 @@ class CircularButton extends Button{
 
 	private float radius;
 	private int status;
+	private float sizing;
 
 
 	CircularButton( PVector _position, color _color, color _colorpressed){
 
 		super( _position, _color, _colorpressed );
-		radius		= 300;
+		radius		= 250;
 
 	}	
 
 	CircularButton( PVector _position, color _color, color _colorpressed, int _status){
 
 		super( _position, _color, _colorpressed );
-		radius		= 300;
+		radius		= 250;
 		status 		= _status;
 
 	}
 
 
 	public void update(){
+
+		sizing += 0.02;
+
+		radius = 250 + sin( sizing ) * 35;
 
 		if( checkPressed() ){
 			changeButtonStatus( true );
@@ -41,11 +46,13 @@ class CircularButton extends Button{
 
 		noStroke();
 		if( pressed ){
-			fill( myColor ); 
+			fill( myColorPressed ); 
 		}else{
-			fill( myColorPressed );
+			fill( myColor );
 		}
 		ellipse( position.x, position.y, radius, radius );
+		fill( 90, 90, 90, 200 );
+		ellipse( position.x, position.y, radius + 50 , radius + 50 );
 
 	}
 
