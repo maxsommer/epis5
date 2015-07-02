@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 8.1.2
+//	Prototyp 3, Version 8.1.3
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -88,6 +88,8 @@
 //		+ Startbutton ist jetzt gestaltet
 //			Und er wird größer und kleiner als Anzeige, dass man touchen kann
 //
+//		+ neue Bewegungsfunktionen 
+//
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
 //		sprich, die Simulation mit dem Kindergarten hat bereits einige Infiziert am Anfang
@@ -111,6 +113,11 @@ boolean directStartMode = false;
 
 //	-1: Grundzustand, 0: Intro, 1: Kindergarten, 2: Simulation, 3: Outro
 int currentStatus			= -1;
+float timeRelation			=  0.035;
+//	60s = 21 tage
+// 	1s = 21/60 tage 
+//	1s = 0.35tage
+//	100ms = 0.035tage
 
 float humanRadius 			= windowResolution.y/60;
 float humanRadiusExtended 		= windowResolution.y/120;	
@@ -216,10 +223,7 @@ public void changeStatus( int newstatus ){
 		//	unterhalb zu sehen ist. Gibt man ihn nicht an, wird einfach davon ausgegangen dass man die cubic Funktion
 		//	benutzen möchte.
 
-		virus.moveTo( windowResolution.x/2 + 80, windowResolution.y/2 + 150, 2000, 1 );
-		virus.moveTo( windowResolution.x/2 + 180, windowResolution.y/2 + 50, 2000, 0 );
-		virus.moveTo( windowResolution.x/2 + 80, windowResolution.y/2 + 150, 500 );
-		virus.moveTo( windowResolution.x/2, windowResolution.y/2 + 250, 500 );
+		playStartScreenAnimation();
 
 	}
 
@@ -263,6 +267,17 @@ public void changeStatus( int newstatus ){
 }
 
 
+public void playStartScreenAnimation(){
+
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 0 );
+	virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 150, 1000, 2 );
+	virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 0, 1000, 3 );
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 0, 1000, 2 );
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
+
+}
+
+
 public void updateStates(){
 
 	switch( currentStatus ){
@@ -278,6 +293,10 @@ public void updateStates(){
 			sim2.render();
 			virus.update();
 			virus.render();
+
+			if( !virus.hasInQueue() ){
+				playStartScreenAnimation();
+			}
 
 			//	Button 
 			startButton.update();

@@ -28,7 +28,6 @@ class Human{
 		positionAlteration.y 	= noise( position.y, position.x );
 		position.x 		+= positionAlteration.x * 12 ;
 		position.y 		+= positionAlteration.y * 12;
-		println( positionAlteration.x + " " + positionAlteration.y );
 		radius			= humanRadius;
 		radiusExtended	= humanRadiusExtended;
 		mySim 			= _sim;

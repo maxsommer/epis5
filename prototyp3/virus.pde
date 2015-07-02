@@ -62,7 +62,7 @@ class Virus{
 	public void updateMovement(){
 
 		//	Entspricht die Position nicht der Zielposition soll das Virus noch bewegt werden
-		if( PVector.dist( position, targetPosition ) > 0.5 ){
+		if( PVector.dist( position, targetPosition ) > 2.5 ){
 
 			if( !isMoving ){
 				myTimer.set( moveTime );
@@ -92,7 +92,28 @@ class Virus{
 									moveTime
 									) 
 							);
+			}			
+			else if( animationType == 2 ){
+				directionNormal.mult(
+							easeInCubic(
+									myTimer.getTimer(),
+									0, 
+									direction.mag(),
+									moveTime
+									) 
+							);
+			}			
+			else if( animationType == 3 ){
+				directionNormal.mult(
+							easeOutCubic(
+									myTimer.getTimer(),
+									0, 
+									direction.mag(),
+									moveTime
+									) 
+							);
 			}
+
 
 			position = PVector.add( 
 						beforePosition, 
@@ -134,10 +155,21 @@ class Virus{
 
 	}
 
+
 	public void moveTo( float _x, float _y, float _time, int _animationType ){
 
 		moveList.add( new VirusTarget( new PVector(_x,_y), _time, _animationType ) );
 
+	}
+
+
+	public boolean hasInQueue(){
+		if( !isMoving && moveList.size() > 0 ){
+			return true;
+		}
+		else{
+			return false;
+		}
 	}
 
 
@@ -166,5 +198,15 @@ class Virus{
 		t--;
 		return c/2 * ( -Math.pow( 2, -10 * t) + 2 ) + b;
 	};
+	float easeInCubic( float t, float b, float c, float d ) {
+		t /= d;
+		return c*t*t*t + b;
+	};
+	float easeOutCubic( float t, float b, float c, float d ) {
+		t /= d;
+		t--;
+		return c*(t*t*t + 1) + b;
+	};
+
 
 }
