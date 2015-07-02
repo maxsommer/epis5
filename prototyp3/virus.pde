@@ -114,10 +114,16 @@ class Virus{
 
 		//	hier Gestaltung vom Virus!
 		fill( myColor );
-		ellipse( (position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
+		image( virusImage,
+			(position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
+			(position.y - sim2.cam.getPosition().y) * sim2.cam.getZoom(),
+			virusImage.width / 2, 
+			virusImage.height / 2
+			);
+		/*ellipse( (position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
 			(position.y - sim2.cam.getPosition().y) * sim2.cam.getZoom(), 
 			(mySize.x) * sim2.cam.getZoom(), 
-			(mySize.y) * sim2.cam.getZoom() );
+			(mySize.y) * sim2.cam.getZoom() );*/
 
 	}
 

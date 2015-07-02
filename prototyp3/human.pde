@@ -26,8 +26,8 @@ class Human{
 		position.y 		= posY;
 		positionAlteration.x 	= noise( position.x, position.y );
 		positionAlteration.y 	= noise( position.y, position.x );
-		position.x 		+= positionAlteration.x * 25 ;
-		position.y 		+= positionAlteration.y * 25;
+		position.x 		+= positionAlteration.x * 12 ;
+		position.y 		+= positionAlteration.y * 12;
 		println( positionAlteration.x + " " + positionAlteration.y );
 		radius			= humanRadius;
 		radiusExtended	= humanRadiusExtended;

@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 8.1
+//	Prototyp 3, Version 8.1.1
 //	
 //	In Arbeit:
 //		+ Klasse Virus
@@ -83,6 +83,8 @@
 //
 //		+ TimeDisplay (Zeitleiste)
 //
+//		+ Bild des Virus
+//
 //	Probleme:
 //		+ Noch werden die Daten zwischen den beiden Simulationen übernommen
 //		sprich, die Simulation mit dem Kindergarten hat bereits einige Infiziert am Anfang
@@ -121,6 +123,7 @@ CircularButton startButton = new CircularButton( new PVector(windowResolution.x/
 
 // 	Virus
 Virus virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
+PImage virusImage;
 
 //	TimeDisplay
 TimeDisplay timeDisplay = new TimeDisplay();
@@ -160,8 +163,9 @@ void setup(){
 	//	Ellipsenursprung im Zentrum
 	ellipseMode(CENTER);
 	//	Schriftart laden
-	Helvetica = loadFont("HelveticaNeue-48.vlw");
-	//textFont( Helvetica );
+	Helvetica 	= loadFont("HelveticaNeue-48.vlw");
+	virusImage 	= loadImage("virus.png");
+	//	textFont( Helvetica );
 	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
 	//	sondern stattdessen lieber nichts
 	if(hideCursor){
