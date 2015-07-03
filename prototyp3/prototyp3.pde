@@ -15,7 +15,7 @@
 //		2:	Städte
 //		3: 	Erkenntnis
 //		4: 	Neustart der Simulation
-//		5:	
+//		5:	Infoanzeige nach Buttonklick
 //		6: 	Übergang Startscreen zu Kindergarten
 //				Virus bewegt sich zum Kindergarten und steckt jemanden an
 //		7:	Vorstellung des eigenen Kindes 
@@ -123,7 +123,7 @@ Timer simulationPauseTimer		= new Timer( 1500, true );
 float rightTransitionOffset 		= windowResolution.x;
 
 //	Testbutton für Touchtisch
-CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 6 );
+CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90, 90, 90 ), color(40, 40, 40), 5 );
 PImage playImage;
 
 // 	Virus
@@ -143,411 +143,415 @@ Simulation sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2,
 Simulation sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
 
 Caption caption = new Caption();
+int timeStampButtonClick; //Zeit zu der der im Startscreen Button geklickt wurde
 
 
-void setup(){
+void setup() {
 
-	//	Fenstergröße setzen
-	size( (int)windowResolution.x , (int)windowResolution.y, P2D );
-	//	Bildschirm Hintergrund weiß malen
-	clearScreen();	
-	//	Die Framerate wird hier auf 120 gesetzt, damit will ich erst einmal 
-	//	feststellen wie schnell die Simulation läuft. Für die finale Version reichen
-	//	auch 60 als Framerate
-	frameRate( framerate );
-	//	Damit wird das Bild etwas weicher und die Kreise nicht so eckig
-	smooth( 8 );
-	//	Ellipsenursprung im Zentrum
-	ellipseMode(CENTER);
-	//	Schriftart laden
-	Helvetica 	= loadFont("HelveticaNeue-48.vlw");
-	//	Bilddateien laden
-	virusImage 	= loadImage("virus.png");
-	playImage 	= loadImage("play.png");
-	//	textFont( Helvetica );
-	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
-	//	sondern stattdessen lieber nichts
-	if(hideCursor){
-		noCursor();
-	}
+  //	Fenstergröße setzen
+  size( (int)windowResolution.x, (int)windowResolution.y, P2D );
+  //	Bildschirm Hintergrund weiß malen
+  clearScreen();	
+  //	Die Framerate wird hier auf 120 gesetzt, damit will ich erst einmal 
+  //	feststellen wie schnell die Simulation läuft. Für die finale Version reichen
+  //	auch 60 als Framerate
+  frameRate( framerate );
+  //	Damit wird das Bild etwas weicher und die Kreise nicht so eckig
+  smooth( 8 );
+  //	Ellipsenursprung im Zentrum
+  ellipseMode(CENTER);
+  //	Schriftart laden
+  Helvetica 	= loadFont("HelveticaNeue-48.vlw");
+  //	Bilddateien laden
+  virusImage 	= loadImage("virus.png");
+  playImage 	= loadImage("play.png");
+  textFont( Helvetica, 12);
 
+  //	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
+  //	sondern stattdessen lieber nichts
+  if (hideCursor) {
+    noCursor();
+  }
 }
 
 
-void draw(){
+void draw() {
 
-	//	die draw aufrufe die dauerhaft ausgefüht werden nennt man drawcalls :)
-	//	bei jedem drawcall sollt zuerst einmal das Bild wieder weiß übermalt werden
-	clearScreen();
+  //	die draw aufrufe die dauerhaft ausgefüht werden nennt man drawcalls :)
+  //	bei jedem drawcall sollt zuerst einmal das Bild wieder weiß übermalt werden
+  clearScreen();
 
-	//	auch im Hauptprogramm werden Timer benötigt.
-	//	diese werden hier geupdatet
-	updateTimers();
+  //	auch im Hauptprogramm werden Timer benötigt.
+  //	diese werden hier geupdatet
+  updateTimers();
 
-	//	mit dieser Funktion werden, je nach aktuellem Status der Applikation
-	//	die nötigen Dinge geupdated und angezeigt
-	updateStates();
+  //	mit dieser Funktion werden, je nach aktuellem Status der Applikation
+  //	die nötigen Dinge geupdated und angezeigt
+  updateStates();
 
-	//	Debuginfo rendern, falls nötig
-	renderDebugInfo();
-
+  //	Debuginfo rendern, falls nötig
+  renderDebugInfo();
 }
 
 
 //	Der Übergang der Stati wird hier gemanaged
 //	Dadurch kann man beispielsweise für den Übergang zweier Phasen einen
 //	Zoom oder eine Kamerabewegung durchführen
-public void changeStatus( int newstatus ){
+public void changeStatus( int newstatus ) {
 
-	currentStatus = newstatus;
+  currentStatus = newstatus;
 
-	if(currentStatus == 0){
+  if (currentStatus == 0) {
 
-		//	Hier wird die Intro Animation des Erzählervirus abespielt
-		//	Mit der Funktion moveTo kann man, wie der Name schon sagt
-		//	das Virus bewegen. 
-		//	
-		//	Die Parameter sind folgende
-		//	moveTo ( X-Position, Y-Position, Zeit, Funktion )
-		//	X-Position: 	Steht für die X-Koordinate der Zielposition
-		//	Y-Position: 	Steht für die Y-Koordinate der Zielposition
-		//	Zeit:		Wie lange soll die Animation dauern?
-		//	
-		//	Funktion:	Welche Bewegungsfunktion soll benutzt werden?
-		//			Entweder: cubic, wofür die 0 eingesetzt werden muss
-		//			Oder: exponential, wofür die 1 eingesetzt werden muss
-		//			
-		//			Man auf folgender Webseite einen guten Vergleich der beiden
-		//			Bewegungsfunktionen, die ich miteingebaut habe sehen: http://gizma.com/easing/
-		//	
-		//	Der Funktionsparameter ist optional, das heißt man muss ihn nicht unbedingt angeben, wie im Beispiel
-		//	unterhalb zu sehen ist. Gibt man ihn nicht an, wird einfach davon ausgegangen dass man die cubic Funktion
-		//	benutzen möchte.
+    //	Hier wird die Intro Animation des Erzählervirus abespielt
+    //	Mit der Funktion moveTo kann man, wie der Name schon sagt
+    //	das Virus bewegen. 
+    //	
+    //	Die Parameter sind folgende
+    //	moveTo ( X-Position, Y-Position, Zeit, Funktion )
+    //	X-Position: 	Steht für die X-Koordinate der Zielposition
+    //	Y-Position: 	Steht für die Y-Koordinate der Zielposition
+    //	Zeit:		Wie lange soll die Animation dauern?
+    //	
+    //	Funktion:	Welche Bewegungsfunktion soll benutzt werden?
+    //			Entweder: cubic, wofür die 0 eingesetzt werden muss
+    //			Oder: exponential, wofür die 1 eingesetzt werden muss
+    //			
+    //			Man auf folgender Webseite einen guten Vergleich der beiden
+    //			Bewegungsfunktionen, die ich miteingebaut habe sehen: http://gizma.com/easing/
+    //	
+    //	Der Funktionsparameter ist optional, das heißt man muss ihn nicht unbedingt angeben, wie im Beispiel
+    //	unterhalb zu sehen ist. Gibt man ihn nicht an, wird einfach davon ausgegangen dass man die cubic Funktion
+    //	benutzen möchte.
 
-		playStartScreenAnimation();
+    playStartScreenAnimation();
+  }
 
-	}
+  if (currentStatus == 1) {
 
-	if(currentStatus == 1){
+    timeDisplay.start();
 
-		timeDisplay.start();
+    //	Heranzoomen und -bewegen	
+    sim2.cam.moveTo( new PVector(windowResolution.x/4*5, windowResolution.y/4), 2.0, 1000 );
 
-		//	Heranzoomen und -bewegen	
-		sim2.cam.moveTo( new PVector(windowResolution.x/4*5,windowResolution.y/4), 2.0, 1000 );
+    // 	Infektion im Kindergarten beginnen
+    sim2.city.kindergarden.startInfection();
 
-		// 	Infektion im Kindergarten beginnen
-		sim2.city.kindergarden.startInfection();
+    //	Die Gesunden in der Legende anzeigen 
+    caption.healthyVisible = true;
+  }
 
-		//	Die Gesunden in der Legende anzeigen 
-		caption.healthyVisible = true;
+  if ( currentStatus == 2 ) {
 
-	}
+    sim.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
+    sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
 
-	if( currentStatus == 2 ){
+    //	Übernahme der Simulationsdaten aus dem Kindergarten
+    for ( int i = 0; i < sim.city.humans.size (); i++ ) {
 
-		sim.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
-		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
+      Human h = sim2.city.humans.get(i);
+      if ( h.isInfecting() ) {
+        sim.city.humans.get(i).infect();
+      }
+    }
 
-		//	Übernahme der Simulationsdaten aus dem Kindergarten
-		for( int i = 0; i < sim.city.humans.size(); i++ ){
+    //	Verschiebung der Kameras
+    sim.cam.moveTo( new PVector( windowResolution.x/4*3, 0 ), 1.0, 1500 );
+    sim2.cam.moveTo( new PVector( windowResolution.x/5*6, 0 ), 1.0, 1500 );
 
-			Human h = sim2.city.humans.get(i);
-			if( h.isInfecting() ){
-				sim.city.humans.get(i).infect();
-			}
+    sim.city.vaccinateCity();
+    sim.city.startInfection();
+    sim2.city.startInfection();	
 
-		}
+    caption.vaccinedVisible = true;
+  }
 
-		//	Verschiebung der Kameras
-		sim.cam.moveTo( new PVector( windowResolution.x/4*3, 0 ), 1.0, 1500 );
-		sim2.cam.moveTo( new PVector( windowResolution.x/5*6, 0 ), 1.0, 1500 );
+  if (currentStatus == 5) {
+    timeStampButtonClick = millis();
+  }
 
-		sim.city.vaccinateCity();
-		sim.city.startInfection();
-		sim2.city.startInfection();	
+  if ( currentStatus == 6 ) {
 
-		caption.vaccinedVisible = true;
-
-	}
-
-	if( currentStatus == 6 ){
-
-		// Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
-		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2500 );
-		simulationPauseTimer.reset();
-		simulationPauseTimer.set( 2500 );
-		simulationPauseTimer.start();
-
-	}
-
+    // Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
+    sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2500 );
+    simulationPauseTimer.reset();
+    simulationPauseTimer.set( 2500 );
+    simulationPauseTimer.start();
+  }
 }
 
 
-public void updateTimers(){
+public void updateTimers() {
 
-	simulationPauseTimer.update();
+  simulationPauseTimer.update();
 
-	if( !simulationPauseTimer.isAlive() ){
-
-	}
-
+  if ( !simulationPauseTimer.isAlive() ) {
+  }
 }
 
 
-public void playStartScreenAnimation(){
+public void playStartScreenAnimation() {
 
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 0 );
-	virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 150, 1000, 2 );
-	virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 0, 1000, 3 );
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 0, 1000, 2 );
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
-
+  virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 0 );
+  virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 150, 1000, 2 );
+  virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 0, 1000, 3 );
+  virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 0, 1000, 2 );
+  virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
 }
 
 
-public void updateStates(){
+public void updateStates() {
 
-	switch( currentStatus ){
+  switch( currentStatus ) {
 
-		case(-1):
-			changeStatus(0);
-		break;
+    case(-1):
+    changeStatus(0);
+    break;
 
-		case(0):
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
-			virus.update();
-			virus.render();
+    case(0):
+    sim.update();
+    sim2.update();
+    sim.render();
+    sim2.render();
+    virus.update();
+    virus.render();
 
-			if( !virus.hasInQueue() ){
-				playStartScreenAnimation();
-			}
+    if ( !virus.hasInQueue() ) {
+      playStartScreenAnimation();
+    }
 
-			//	Button 
-			startButton.update();
-			startButton.render();
-			//	Legende
-			caption.update();
-			caption.render();
+    //	Button 
+    startButton.update();
+    startButton.render();
+    //	Legende
+    caption.update();
+    caption.render();
 
-		break;
+    break;
 
-		case(1):
+    case(1):
 
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
-			caption.update();
-			caption.render();
-			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
+    sim.update();
+    sim2.update();
+    sim.render();
+    sim2.render();
+    caption.update();
+    caption.render();
+    //	Zeitleiste
+    timeDisplay.update();
+    timeDisplay.render();
 
-		break;
+    break;
 
-		case(2):
+    case(2):
 
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
-			caption.update();
-			caption.render();
-			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
+    sim.update();
+    sim2.update();
+    sim.render();
+    sim2.render();
+    caption.update();
+    caption.render();
+    //	Zeitleiste
+    timeDisplay.update();
+    timeDisplay.render();
 
-		break;
+    break;
 
-		case(3):
+    case(3):
 
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
-			caption.update();
-			caption.render();
-			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
+    sim.update();
+    sim2.update();
+    sim.render();
+    sim2.render();
+    caption.update();
+    caption.render();
+    //	Zeitleiste
+    timeDisplay.update();
+    timeDisplay.render();
 
-		break;
+    break;
 
-		case(6):
-		
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
-			caption.update();
-			caption.render();
-			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
+    case(5):
+    virus.update();
+    virus.render();
+    if (millis() - timeStampButtonClick > 7000) {
+      changeStatus ( 6 );
+    } else {
+      drawInfoScreen();
+    }
 
-			if( !virus.hasInQueue() ){
-				playStartScreenAnimation();
-			}
 
-			//	Button 
-			startButton.update();
-			startButton.render();
 
-			if( simulationPauseTimer.completed ){
-				changeStatus( 1 );
-			}
+    break;
 
-		break;
+    case(6):
 
-	}
+    sim.update();
+    sim2.update();
+    sim.render();
+    sim2.render();
+    caption.update();
+    caption.render();
+    //	Zeitleiste
+    timeDisplay.update();
+    timeDisplay.render();
 
+    if ( !virus.hasInQueue() ) {
+      playStartScreenAnimation();
+    }
+
+    //	Button 
+    startButton.update();
+    startButton.render();
+
+    if ( simulationPauseTimer.completed ) {
+      changeStatus( 1 );
+    }
+
+    break;
+  }
 }
 
 
 //	Wie der Name der Funktion schon sagt kann man hiermit die Simulationen
 //	zurücksetzen und neu starten
-public void restartSimulation(){
+public void restartSimulation() {
 
-	virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
-	timeDisplay = new TimeDisplay();
-	currentStatus = -1;
-	numberInfectedKindergarden = 0;
-	startPerson = 0;
-	startPersonGenerated = false;
-	sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2, 1 );
-	sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
-
+  virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
+  timeDisplay = new TimeDisplay();
+  currentStatus = -1;
+  numberInfectedKindergarden = 0;
+  startPerson = 0;
+  startPersonGenerated = false;
+  sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2, 1 );
+  sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
 }
 
 
-public void clearScreen(){
+public void clearScreen() {
 
-	//	Hintergrund wird weiß überzeichnet
-	background( 255 );
-
+  //	Hintergrund wird weiß überzeichnet
+  background( 255 );
 }
 
 
-boolean sketchFullScreen(){
+boolean sketchFullScreen() {
 
-	//	Soll die Simulation im Vollbild ausgeführt werden muss die Variable fullscreen 
-	//	einfach false gesetzt werden
-	return fullscreen;
-
+  //	Soll die Simulation im Vollbild ausgeführt werden muss die Variable fullscreen 
+  //	einfach false gesetzt werden
+  return fullscreen;
 }
 
 
 //	Diese Funktion "erwürfelt" quasi den Eintritt oder Nicht-Eintritt
 //	eines Ereignisses mit Wahrscheinlichkeit "percent"
-boolean percentChance( float percent ){
+boolean percentChance( float percent ) {
 
-	if( random( 0, 100 ) < percent ){
-		return true;
-	}
+  if ( random( 0, 100 ) < percent ) {
+    return true;
+  }
 
-	return false;
-
+  return false;
 }
 
 
-public void keyPressed(){
+public void keyPressed() {
 
-	switch(key){
+  switch(key) {
 
-		case 'r':
-		case 'R':
-			restartSimulation();
-		break;
+  case 'r':
+  case 'R':
+    restartSimulation();
+    break;
 
-		case 'd':
-		case 'D':
-			debugMode = !debugMode;
-		break;
+  case 'd':
+  case 'D':
+    debugMode = !debugMode;
+    break;
 
-		case 'p':
-		case 'P':
-			if(!sim.isPaused()){
-				sim.pauseSim();
-			}
-			else{
-				sim.resumeSim();
-			}
+  case 'p':
+  case 'P':
+    if (!sim.isPaused()) {
+      sim.pauseSim();
+    } else {
+      sim.resumeSim();
+    }
 
-			if(!sim2.isPaused()){
-				sim2.pauseSim();
-			}
-			else{
-				sim2.resumeSim();
-			}
+    if (!sim2.isPaused()) {
+      sim2.pauseSim();
+    } else {
+      sim2.resumeSim();
+    }
 
-		break;
+    break;
 
-		case 'n':
-		case 'N':
-			//	Hier wird zwischen den Stati der Applikation, also in welcher Phase
-			//	man sich gerade befindet umgeschaltet. Mögliche Stati sind zB
-			//	Intro, Kindergarten, Simulation oder Outro
-			if( currentStatus < 3 ){
-				changeStatus( (currentStatus+1) );
-			}
-			else{
-				restartSimulation();
-			}
-		break;
-
-	}
-
+  case 'n':
+  case 'N':
+    //	Hier wird zwischen den Stati der Applikation, also in welcher Phase
+    //	man sich gerade befindet umgeschaltet. Mögliche Stati sind zB
+    //	Intro, Kindergarten, Simulation oder Outro
+    if ( currentStatus < 3 ) {
+      changeStatus( (currentStatus+1) );
+    } else {
+      restartSimulation();
+    }
+    break;
+  }
 }
 
 
-public void renderDebugInfo(){
+public void renderDebugInfo() {
 
-		if( debugMode ){
+  if ( debugMode ) {
 
-			fill( 0, 0, 230 );
-			text(frameRate+"fps", 20, 20);
+    fill( 0, 0, 230 );
+    text(frameRate+"fps", 20, 20);
 
-			if( sim.isPaused() && sim2.isPaused()){
-				fill( 230, 0, 0);
-				text("Simulation is paused", 20, 40);
+    if ( sim.isPaused() && sim2.isPaused()) {
+      fill( 230, 0, 0);
+      text("Simulation is paused", 20, 40);
+    } else {
+      fill( 0, 230, 0 );
+      text("Simulation is running", 20, 40);
+    }
 
-			}else{
-				fill( 0, 230, 0 );
-				text("Simulation is running", 20, 40);
-			}
+    fill( 0, 230, 0 );
+    String statusWord = "";
+    switch( currentStatus ) {
 
-			fill( 0, 230, 0 );
-			String statusWord = "";
-			switch( currentStatus ){
+      case(0):
+      statusWord = "Intro";
+      break;
 
-				case(0):
-					statusWord = "Intro";
-				break;
+      case(1):
+      statusWord = "Kindergarden";
+      break;
 
-				case(1):
-					statusWord = "Kindergarden";
-				break;
+      case(2):
+      statusWord = "Simulation";
+      break;
 
-				case(2):
-					statusWord = "Simulation";
-				break;
+      case(3):
+      statusWord = "Outro";
+      break;
+      
+      case(5):
+      statusWord = "Infoscreen";
+      break;
+    }
+    text("Status: " + statusWord, 20, 60);
 
-				case(3):
-					statusWord = "Outro";
-				break;
-
-			}
-			text("Status: " + statusWord, 20, 60);
-
-			fill( 50 );
-			text("Press 'r' to restart", 20, 80);
-			text("Press 'd' to toggle debug mode", 20, 100);
-			text("Press 'p' to play/pause the simulation", 20, 120);
-			text("Press 'n' to switch between states", 20, 140);
-
-		}
-
+    fill( 50 );
+    text("Press 'r' to restart", 20, 80);
+    text("Press 'd' to toggle debug mode", 20, 100);
+    text("Press 'p' to play/pause the simulation", 20, 120);
+    text("Press 'n' to switch between states", 20, 140);
+  }
 }
+
+public void drawInfoScreen() {
+  textSize(50);
+  text("Masern!", windowResolution.x/2, windowResolution.y/2);
+  textSize(12);
+}
+
