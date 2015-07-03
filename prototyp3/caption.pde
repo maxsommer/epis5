@@ -14,7 +14,7 @@ class Caption {
 
   Caption() {
 
-    h2.setState( 1 );
+    h2.setState( 2 );
     h2.timer.reset();
     h5.setState( 4 );
     h5.timer.reset();

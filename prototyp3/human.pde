@@ -2,222 +2,218 @@
 //	Die Klasse Human sagt bereits mit dem Namen alles aus
 //	
 
-class Human{
+class Human {
+
+  protected PVector position = new PVector( 0, 0 );
+  protected PVector positionAlteration = new PVector( 0, 0 );
+  protected float myColorRed = 0;
+  protected float myColorGreen = 0;
+  protected float myColorBlue = 200;
+  protected float myAlpha = 255;
+  protected float radius = 0;
+  protected float radiusExtended = 0;
+  protected boolean relativeToCamera = true;
+  protected Simulation mySim;
+
+  //	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus, 4: geimpft
+  protected int state = 0;
+  protected Timer timer = new Timer( 10000 + random(-5000, 5000), true );
+
+
+  Human( float posX, float posY, Simulation _sim ) {
+
+    position.x 		= posX;
+    position.y 		= posY;
+    positionAlteration.x 	= noise( position.x, position.y );
+    positionAlteration.y 	= noise( position.y, position.x );
+    position.x 		+= positionAlteration.x * 12 ;
+    position.y 		+= positionAlteration.y * 12;
+    radius			= humanRadius;
+    radiusExtended	= humanRadiusExtended;
+    mySim 			= _sim;
+  }
+
+  Human( float posX, float posY, boolean _relativeToCamera) {
+
+    position.x 		= posX;
+    position.y 		= posY;
+    radius			= humanRadius;
+    radiusExtended	= humanRadiusExtended;
+    relativeToCamera	= _relativeToCamera;
+  }
+
+
+  public void update() {
+
+    timer.update();
+
+    //	Wechsel von Status 1 (Infiziert, ohne Symptome) auf 2 (Infiziert, mit Symptomen)
+    if ( state == 1 && !timer.paused && !timer.isAlive() ) {
+
+      timer.reset();
+      timer.set( 3000 + random(-1000, 1000) );
+      timer.start();
+      state = 2;
+    }
+
+    //	Wechsel von Status 2 (Infiziert, mit Symptomen) auf 3 (Krankenhaus)
+    if (state == 2 && !timer.paused && !timer.isAlive() ) {
+
+      timer.reset();
+
+      if ( percentChance( 13 ) ) {
+        state = 3;
+      }
+    }
+
+    //	Farbe einstellen, je nach Status
+    if (state == 0) {		//	Gesund
+      myColorRed = 2;
+      myColorGreen = 191;
+      myColorBlue = 249;
+    } else if (state == 1) {	//	Infiziert ohne Symptome
+      float colorTimer =  timer.getTimer();  
+      if (colorTimer <= 4000) {  //umfärbung über 4 sekunden
+        myColorRed = int (2 + ((colorTimer*237)/4000));
+        myColorGreen = int (191 - ((colorTimer*149)/4000));
+        myColorBlue = int (249 - ((colorTimer*227)/4000));
+      } else {
+        myColorRed = 239;
+        myColorGreen = 42;
+        myColorBlue = 22;
+      }
+    } else if (state == 2) {  //  Infiziert mit Symptome
+      myColorRed = 239;
+      myColorGreen = 42;
+      myColorBlue = 22;
+    } else if (state == 3) {  //  Infiziert im Krankenhaus
+      myColorRed = 239;
+      myColorGreen = 42;
+      myColorBlue = 22;
+    } else if (state == 4) {	// 	Geimpft
+      myColorRed = 2;
+      myColorGreen = 191;
+      myColorBlue = 249;
+    }
+  }
+
+
+  public void render() {
+
+    noStroke();
+
+    if (relativeToCamera) {
 
-	protected PVector position = new PVector( 0, 0 );
-	protected PVector positionAlteration = new PVector( 0, 0 );
-	protected float myColorRed = 0;
-	protected float myColorGreen = 0;
-	protected float myColorBlue = 200;
-	protected float myAlpha = 255;
-	protected float radius = 0;
-	protected float radiusExtended = 0;
-	protected boolean relativeToCamera = true;
-	protected Simulation mySim;
+      if ( state == 4 ) {
 
-	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus, 4: geimpft
-	protected int state = 0;
-	protected Timer timer = new Timer( 10000 + random(-5000, 5000), true );
+        fill( 44, 73, 153 );
+        ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+        (position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+        (radius+radiusExtended) * mySim.cam.getZoom(), 
+        (radius+radiusExtended) * mySim.cam.getZoom() );
 
+        fill( myColorRed, myColorGreen, myColorBlue );
+        ellipse( 
+        (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+        (position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+        (radius) * mySim.cam.getZoom(), 
+        (radius) * mySim.cam.getZoom() );
+      } else {
 
-	Human( float posX, float posY, Simulation _sim ){
+        fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
+        ellipse( 
+        (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
+        (position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
+        (radius+radiusExtended) * mySim.cam.getZoom(), 
+        (radius+radiusExtended) * mySim.cam.getZoom() );
+      }
+    }
 
-		position.x 		= posX;
-		position.y 		= posY;
-		positionAlteration.x 	= noise( position.x, position.y );
-		positionAlteration.y 	= noise( position.y, position.x );
-		position.x 		+= positionAlteration.x * 12 ;
-		position.y 		+= positionAlteration.y * 12;
-		radius			= humanRadius;
-		radiusExtended	= humanRadiusExtended;
-		mySim 			= _sim;
+    if (!relativeToCamera) {
 
-	}
+      if ( state == 4 ) {
 
-	Human( float posX, float posY , boolean _relativeToCamera){
+        fill( 44, 73, 153 );
+        ellipse( (position.x), 
+        (position.y), 
+        (radius+radiusExtended), 
+        (radius+radiusExtended)
+          );
 
-		position.x 		= posX;
-		position.y 		= posY;
-		radius			= humanRadius;
-		radiusExtended	= humanRadiusExtended;
-		relativeToCamera	= _relativeToCamera;
+        fill( myColorRed, myColorGreen, myColorBlue );
+        ellipse( 
+        (position.x), 
+        (position.y), 
+        (radius), 
+        (radius)
+          );
+      } else {
 
-	}
+        fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
+        ellipse( 
+        (position.x), 
+        (position.y), 
+        (radius+radiusExtended), 
+        (radius+radiusExtended)
+          );
+      }
+    }
+  }
 
 
-	public void update(){
+  public boolean inRange( Human h ) {
 
-		timer.update();
+    if ( PVector.dist( this.position, h.position ) < sim.infectionRange ) {
 
-		//	Wechsel von Status 1 (Infiziert, ohne Symptome) auf 2 (Infiziert, mit Symptomen)
-		if( state == 1 && !timer.paused && !timer.isAlive() ){
+      return true;
+    }
 
-			timer.reset();
-			timer.set( 3000 + random(-1000,1000) );
-			timer.start();
-			state = 2;
+    return false;
+  }
 
-		}
 
-		//	Wechsel von Status 2 (Infiziert, mit Symptomen) auf 3 (Krankenhaus)
-		if(state == 2 && !timer.paused && !timer.isAlive() ){
+  public boolean isInfecting(  ) {
 
-			timer.reset();
+    if ( this.state == 1 || this.state == 2 ) {
+      return true;
+    }
 
-				if( percentChance( 13 ) ){
-					state = 3;
-				}
+    return false;
+  }
 
-		}
 
-		//	Farbe einstellen, je nach Status
-		if(state == 0){		//	Gesund
-			myColorRed = 2;
-			myColorGreen = 191;
-			myColorBlue = 249;
-		}else if(state == 1 || state == 2 || state == 3){	//	Infiziert
-			myColorRed = 239;
-			myColorGreen = 42;
-			myColorBlue = 22;
-		}else if(state == 4){	// 	Geimpft
-			myColorRed = 2;
-			myColorGreen = 191;
-			myColorBlue = 249;
-		}
+  public void setPosition( PVector _pos ) {
+    position = _pos;
+  }
 
-	}
 
+  public void infect() {
 
-	public void render(){
+    //	es kann nur infiziert werden, wer es noch nicht ist!
+    //	bzw. wer nicht geimpft ist
+    if (this.state == 0) {
+      this.state = 1;
+      timer.start();
+    }
+  }
 
-		noStroke();
 
-		if(relativeToCamera){
+  public void vaccinate() {
 
-			if( state == 4 ){
+    //	Mensch wird geimpft, falls er es noch nicht ist.
+    if (this.state != 4) {
+      this.state = 4;
+    }
+  }
 
-				fill( 44, 73, 153 );
-				ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
-					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
-					(radius+radiusExtended) * mySim.cam.getZoom(), 
-					(radius+radiusExtended) * mySim.cam.getZoom() );
 
-				fill( myColorRed, myColorGreen, myColorBlue );
-				ellipse( 
-					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
-					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
-					(radius) * mySim.cam.getZoom(), 
-					(radius) * mySim.cam.getZoom() );
+  public void setState( int _state ) {
+    state = _state;
+  }
 
-			}
-			else{
 
-				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
-				ellipse( 
-					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
-					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
-					(radius+radiusExtended) * mySim.cam.getZoom(), 
-					(radius+radiusExtended) * mySim.cam.getZoom() );
-
-			}
-
-		}
-
-		if(!relativeToCamera){
-
-			if( state == 4 ){
-
-				fill( 44, 73, 153 );
-				ellipse( (position.x), 
-					(position.y), 
-					(radius+radiusExtended), 
-					(radius+radiusExtended)
-					);
-
-				fill( myColorRed, myColorGreen, myColorBlue );
-				ellipse( 
-					(position.x), 
-					(position.y), 
-					(radius), 
-					(radius)
-					);
-
-			}
-			else{
-
-				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
-				ellipse( 
-					(position.x), 
-					(position.y), 
-					(radius+radiusExtended), 
-					(radius+radiusExtended)
-					);
-
-			}
-			
-		}
-
-	}
-
-
-	public boolean inRange( Human h ){
-
-		if( PVector.dist( this.position, h.position ) < sim.infectionRange ){
-
-			return true;
-
-		}
-
-		return false;
-
-	}
-
-
-	public boolean isInfecting(  ){
-
-		if( this.state == 1 || this.state == 2 ){
-			return true;
-		}
-
-		return false;
-
-	}
-
-
-	public void setPosition( PVector _pos ){
-		position = _pos;
-	}
-
-
-	public void infect(){
-
-		//	es kann nur infiziert werden, wer es noch nicht ist!
-		//	bzw. wer nicht geimpft ist
-		if(this.state == 0){
-			this.state = 1;
-			timer.start();
-		}
-
-	}
-
-
-	public void vaccinate(){
-
-		//	Mensch wird geimpft, falls er es noch nicht ist.
-		if(this.state != 4){
-			this.state = 4;
-		}
-
-	}
-
-
-	public void setState( int _state ){
-		state = _state;
-	}
-
-
-	public PVector getPosition(){
-		return position;
-	}
-
+  public PVector getPosition() {
+    return position;
+  }
 }
+

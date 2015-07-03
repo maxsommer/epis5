@@ -374,7 +374,7 @@ public void updateStates() {
     case(5):
     virus.update();
     virus.render();
-    if (millis() - timeStampButtonClick > 7000) {
+    if (millis() - timeStampButtonClick > 3000) { //atm 3 sec dauer
       changeStatus ( 6 );
     } else {
       drawInfoScreen();
