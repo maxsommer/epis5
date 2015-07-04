@@ -83,7 +83,7 @@ class City{
 
 		updateNumberInfectedRight();
 
-		if( this.mySim == sim2 && (currentStatus == 1)  ){
+		if( this.mySim == sim2 && (currentStatus == 1 || currentStatus == 7)  ){
 			kindergarden.update();
 		}
 
@@ -117,7 +117,7 @@ class City{
 
 	public void render(){
 
-		if( this.mySim == sim2 && (currentStatus == 1 || currentStatus == 6) ){
+		if( this.mySim == sim2 && (currentStatus == 1 || currentStatus == 6 || currentStatus == 7) ){
 			kindergarden.render();
 		}
 

@@ -18,6 +18,8 @@ class Human{
 	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus, 4: geimpft
 	protected int state = 0;
 	protected Timer timer = new Timer( 10000 + random(-5000, 5000), true );
+	protected int fadeStatus = 0;
+	protected boolean fadedOut = false;
 
 
 	Human( float posX, float posY, Simulation _sim ){
@@ -48,6 +50,15 @@ class Human{
 	public void update(){
 
 		timer.update();
+
+		fadeIn();
+		fadeOut();
+
+		if( currentStatus == 1 ){
+			fadedOut = true;
+		}else{
+			fadedOut = false;
+		}
 
 		//	Wechsel von Status 1 (Infiziert, ohne Symptome) auf 2 (Infiziert, mit Symptomen)
 		if( state == 1 && !timer.paused && !timer.isAlive() ){
@@ -96,13 +107,13 @@ class Human{
 
 			if( state == 4 ){
 
-				fill( 44, 73, 153 );
+				fill( 44, 73, 153, myAlpha );
 				ellipse( (position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
 					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
 					(radius+radiusExtended) * mySim.cam.getZoom(), 
 					(radius+radiusExtended) * mySim.cam.getZoom() );
 
-				fill( myColorRed, myColorGreen, myColorBlue );
+				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
 				ellipse( 
 					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
 					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 
@@ -155,6 +166,40 @@ class Human{
 
 			}
 			
+		}
+
+	}
+
+
+	public void fadeOut(){
+
+		if( fadedOut && relativeToCamera ){
+
+			if( fadeStatus < 200 ){
+				fadeStatus++;
+				myAlpha = 255 - fadeStatus;
+			}
+			else{
+				myAlpha = 55;
+			}
+
+		}
+
+	}
+
+
+	public void fadeIn(){
+
+		if( !fadedOut && relativeToCamera ){		
+
+			if( fadeStatus < 255 ){
+				fadeStatus--;
+				myAlpha = 255 - fadeStatus;
+			}
+			else{
+				myAlpha = 255;
+			}
+
 		}
 
 	}

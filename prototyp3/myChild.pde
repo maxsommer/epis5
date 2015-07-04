@@ -33,7 +33,7 @@ class myChild extends Human{
 			}
 			else{
 
-				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
+				fill( myColorRed, myColorGreen, myColorBlue );
 				ellipse( 
 					(position.x - mySim.cam.getPosition().x) * mySim.cam.getZoom(), 
 					(position.y - mySim.cam.getPosition().y) * mySim.cam.getZoom(), 

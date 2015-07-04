@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 9.1
+//	Prototyp 3, Version 9.2
 //
 //	Ablauf der Stati:
 //		-1: 	Starten der Applikation
@@ -23,11 +23,6 @@
 //				"Das ist dein Kind"
 //		8: 	Übergang Kindergarten zu Stadt
 //	
-//	In Arbeit:
-//		+ Klasse Virus
-//		+ Übergansanimationen zwischen den verschiedenen Stati
-//		+ Automatischer Übergang zwischen Zustand -1 zu 0
-//		+ Automatischer Übergang zwischen Zustand 2 zu 3
 //		
 //	Zu tun:
 //		+ Sound
@@ -94,9 +89,9 @@
 
 //	Einstellungen
 //
-PVector windowResolution = new PVector( 1440, 900 );
-boolean debugMode = true;
-boolean hideCursor = false;
+PVector windowResolution = new PVector( 1920, 1080 );
+boolean debugMode = false;
+boolean hideCursor = true;
 
 int framerate = 120;
 boolean fullscreen = true;
@@ -160,7 +155,7 @@ void setup(){
 	//	Ellipsenursprung im Zentrum
 	ellipseMode(CENTER);
 	//	Schriftart laden
-	Helvetica 	= loadFont("HelveticaNeue-48.vlw");
+	Helvetica 	= loadFont("Helvetica-Bold-48.vlw");
 	//	Bilddateien laden
 	virusImage 	= loadImage("virus.png");
 	playImage 	= loadImage("play.png");
@@ -201,6 +196,7 @@ public void changeStatus( int newstatus ){
 
 	currentStatus = newstatus;
 
+	//	Startscreen
 	if(currentStatus == 0){
 
 		//	Hier wird die Intro Animation des Erzählervirus abespielt
@@ -228,12 +224,35 @@ public void changeStatus( int newstatus ){
 
 	}
 
+	//	Übergang Startscreen zu Kindvorstellung
+	if( currentStatus == 6 ){
+
+		// Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
+		// danach wird dann das eigene Kind vorgestellt in Status 1
+		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2000 );
+		simulationPauseTimer.reset();
+		simulationPauseTimer.set( 2000 );
+		simulationPauseTimer.start();
+
+	}
+
+	//	Kindvorstellung
 	if(currentStatus == 1){
 
-		timeDisplay.start();
-
 		//	Heranzoomen und -bewegen	
+		sim2.cam.moveTo( new PVector(windowResolution.x/16*21.65,windowResolution.y/16 *5.3), 4.0, 1000 );
+		simulationPauseTimer.reset();
+		simulationPauseTimer.set( 3000 );
+		simulationPauseTimer.start();
+
+	}
+
+	//	Übergang Kindvorstellung zu Kindergarten
+	if( currentStatus == 7){
+
 		sim2.cam.moveTo( new PVector(windowResolution.x/4*5,windowResolution.y/4), 2.0, 1000 );
+
+		timeDisplay.start();
 
 		// 	Infektion im Kindergarten beginnen
 		sim2.city.kindergarden.startInfection();
@@ -270,16 +289,6 @@ public void changeStatus( int newstatus ){
 
 	}
 
-	if( currentStatus == 6 ){
-
-		// Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
-		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2500 );
-		simulationPauseTimer.reset();
-		simulationPauseTimer.set( 2500 );
-		simulationPauseTimer.start();
-
-	}
-
 }
 
 
@@ -287,19 +296,16 @@ public void updateTimers(){
 
 	simulationPauseTimer.update();
 
-	if( !simulationPauseTimer.isAlive() ){
-
-	}
+	simulationPauseTimer.isAlive();
 
 }
 
 
 public void playStartScreenAnimation(){
 
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 0 );
-	virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 150, 1000, 2 );
-	virus.moveTo( windowResolution.x/2 + 200, windowResolution.y/2 + 0, 1000, 3 );
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 0, 1000, 2 );
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 +50, 700, 2 );
+	virus.moveTo( windowResolution.x/2 + 100, windowResolution.y/2 + 200, 700, 3 );
+	virus.moveTo( windowResolution.x/2 + 50, windowResolution.y/2 + 0, 1000, 2 );
 	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
 
 }
@@ -334,6 +340,34 @@ public void updateStates(){
 
 		break;
 
+		case(6):
+		
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			caption.update();
+			caption.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
+			virus.update();
+			virus.render();
+
+			if( !virus.hasInQueue() ){
+				playStartScreenAnimation();
+			}
+
+			//	Button 
+			startButton.update();
+			startButton.render();
+
+			if( simulationPauseTimer.completed ){
+				changeStatus( 1 );
+			}
+
+		break;
+
 		case(1):
 
 			sim.update();
@@ -342,6 +376,33 @@ public void updateStates(){
 			sim2.render();
 			caption.update();
 			caption.render();
+			virus.update();
+			virus.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
+
+			textSize( 48 );
+			textFont( Helvetica);
+			text( thisIsYourChild, windowResolution.x / 2 - 50, 200 );
+			textSize( 12 );
+
+			if( simulationPauseTimer.completed ){
+				changeStatus( 7 );
+			}
+
+		break;
+
+		case(7):
+
+			sim.update();
+			sim2.update();
+			sim.render();
+			sim2.render();
+			caption.update();
+			caption.render();
+			virus.update();
+			virus.render();
 			//	Zeitleiste
 			timeDisplay.update();
 			timeDisplay.render();
@@ -376,32 +437,6 @@ public void updateStates(){
 
 		break;
 
-		case(6):
-		
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
-			caption.update();
-			caption.render();
-			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
-
-			if( !virus.hasInQueue() ){
-				playStartScreenAnimation();
-			}
-
-			//	Button 
-			startButton.update();
-			startButton.render();
-
-			if( simulationPauseTimer.completed ){
-				changeStatus( 1 );
-			}
-
-		break;
-
 	}
 
 }
@@ -412,11 +447,15 @@ public void updateStates(){
 public void restartSimulation(){
 
 	virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
-	timeDisplay = new TimeDisplay();
+	timeDisplay = new TimeDisplay(); 
+	caption.healthyVisible = false;
+	caption.vaccinedVisible = false;
+	caption.infectedVisible = false;
 	currentStatus = -1;
 	numberInfectedKindergarden = 0;
 	startPerson = 0;
 	startPersonGenerated = false;
+	caption = new Caption();
 	sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2, 1 );
 	sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
 
