@@ -16,6 +16,8 @@ class Virus{
 	private PVector direction 		= new PVector(0,0);
 	private PVector directionNormal 	= new PVector(0,0);
 	private PVector mySize;
+	private float size 			= 1.0;
+	private float targetSize 			= 1.0;
 	private float moveTime 		= 0;
 	private int animationType 		= 0;
 	private color myColor;
@@ -41,6 +43,12 @@ class Virus{
 
 		myTimer.update();
 		updateMovement();
+
+		if( targetSize <= size ){
+			float sd = targetSize - size;
+			sd /= 10;
+			size += sd;
+		}
 
 		//	Wenn der Virus sich nicht mehr in einer Animation befindet,
 		//	nächste Zielposition holen und animieren
@@ -138,13 +146,9 @@ class Virus{
 		image( virusImage,
 			(position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
 			(position.y - sim2.cam.getPosition().y) * sim2.cam.getZoom(),
-			virusImage.width / 2, 
-			virusImage.height / 2
+			(virusImage.width / 2) * sim2.cam.getZoom() * size, 
+			(virusImage.height / 2)  * sim2.cam.getZoom() * size
 			);
-		/*ellipse( (position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
-			(position.y - sim2.cam.getPosition().y) * sim2.cam.getZoom(), 
-			(mySize.x) * sim2.cam.getZoom(), 
-			(mySize.y) * sim2.cam.getZoom() );*/
 
 	}
 
@@ -159,6 +163,13 @@ class Virus{
 	public void moveTo( float _x, float _y, float _time, int _animationType ){
 
 		moveList.add( new VirusTarget( new PVector(_x,_y), _time, _animationType ) );
+
+	}
+
+
+	public void shrinkTo( float _size ) {
+
+		targetSize = _size;
 
 	}
 

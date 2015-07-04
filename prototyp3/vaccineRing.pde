@@ -25,10 +25,7 @@ class VaccineRing{
 
 	public void render(){
 
-		fill( myColor );
-		ellipse( position.x, position.y, radius, radius );
-		fill( 255 );
-		ellipse( position.x, position.y, radius/3*2, radius/3*2 );
+		image( vaccineImage, position.x, position.y, radius, radius );
 
 	}
 

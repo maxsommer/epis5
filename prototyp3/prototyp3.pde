@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 9.2
+//	Prototyp 3, Version 9.3
 //
 //	Ablauf der Stati:
 //		-1: 	Starten der Applikation
@@ -116,6 +116,7 @@ float numberInfectedRightSim 		= 0;
 float numberInfectedRightSimTransition = 70 ;
 Timer simulationPauseTimer		= new Timer( 1500, true );
 float rightTransitionOffset 		= windowResolution.x;
+boolean vaccineHintShown = false;
 
 //	Testbutton für Touchtisch
 CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 6 );
@@ -124,6 +125,9 @@ PImage playImage;
 // 	Virus
 Virus virus = new Virus( new PVector(windowResolution.x/2, windowResolution.y - 200) ); 
 PImage virusImage;
+
+//	Impstoff
+PImage vaccineImage;
 
 //	TimeDisplay
 TimeDisplay timeDisplay = new TimeDisplay();
@@ -154,11 +158,13 @@ void setup(){
 	smooth( 8 );
 	//	Ellipsenursprung im Zentrum
 	ellipseMode(CENTER);
+	imageMode(CENTER);
 	//	Schriftart laden
 	Helvetica 	= loadFont("Helvetica-Bold-48.vlw");
 	//	Bilddateien laden
 	virusImage 	= loadImage("virus.png");
 	playImage 	= loadImage("play.png");
+	vaccineImage 	= loadImage("vaccine.png");
 	//	textFont( Helvetica );
 	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
 	//	sondern stattdessen lieber nichts
@@ -230,6 +236,10 @@ public void changeStatus( int newstatus ){
 		// Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
 		// danach wird dann das eigene Kind vorgestellt in Status 1
 		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2000 );
+		virus.moveTo( 
+			sim2.city.humans.get( startPerson ).position.x + 9, 
+			sim2.city.humans.get( startPerson ).position.y -2 , 
+			3000 ); 
 		simulationPauseTimer.reset();
 		simulationPauseTimer.set( 2000 );
 		simulationPauseTimer.start();
@@ -239,6 +249,7 @@ public void changeStatus( int newstatus ){
 	//	Kindvorstellung
 	if(currentStatus == 1){
 
+		virus.shrinkTo( 0.25 );
 		//	Heranzoomen und -bewegen	
 		sim2.cam.moveTo( new PVector(windowResolution.x/16*21.65,windowResolution.y/16 *5.3), 4.0, 1000 );
 		simulationPauseTimer.reset();
@@ -263,6 +274,10 @@ public void changeStatus( int newstatus ){
 	}
 
 	if( currentStatus == 2 ){
+
+		simulationPauseTimer.reset();
+		simulationPauseTimer.set( 3000 );
+		simulationPauseTimer.start();
 
 		sim.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
 		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
@@ -289,6 +304,11 @@ public void changeStatus( int newstatus ){
 
 	}
 
+	if( currentStatus == 8 ){
+
+
+	}
+
 }
 
 
@@ -302,12 +322,12 @@ public void updateTimers(){
 
 
 public void playStartScreenAnimation(){
-
+/*
 	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 +50, 700, 2 );
 	virus.moveTo( windowResolution.x/2 + 100, windowResolution.y/2 + 200, 700, 3 );
 	virus.moveTo( windowResolution.x/2 + 50, windowResolution.y/2 + 0, 1000, 2 );
 	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
-
+*/
 }
 
 
@@ -349,8 +369,6 @@ public void updateStates(){
 			caption.update();
 			caption.render();
 			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
 			virus.update();
 			virus.render();
 
@@ -359,7 +377,7 @@ public void updateStates(){
 			}
 
 			//	Button 
-			startButton.update();
+			startButton.reduceSize();
 			startButton.render();
 
 			if( simulationPauseTimer.completed ){
@@ -378,10 +396,6 @@ public void updateStates(){
 			caption.render();
 			virus.update();
 			virus.render();
-			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
-
 			textSize( 48 );
 			textFont( Helvetica);
 			text( thisIsYourChild, windowResolution.x / 2 - 50, 200 );
@@ -401,8 +415,6 @@ public void updateStates(){
 			sim2.render();
 			caption.update();
 			caption.render();
-			virus.update();
-			virus.render();
 			//	Zeitleiste
 			timeDisplay.update();
 			timeDisplay.render();
@@ -415,11 +427,24 @@ public void updateStates(){
 			sim2.update();
 			sim.render();
 			sim2.render();
-			caption.update();
-			caption.render();
 			//	Zeitleiste
 			timeDisplay.update();
 			timeDisplay.render();
+
+			if( !simulationPauseTimer.paused && !vaccineHintShown ){			
+				fill( 255, 255, 255, 150 );
+				rect( 0, 0, windowResolution.x, windowResolution.y-60 );
+				textSize(48);
+				fill(0);
+				text( vaccineYourChild, windowResolution.x/2 - 300, windowResolution.y/2 );
+				textSize( 12 );
+			}
+			if(simulationPauseTimer.completed){
+				vaccineHintShown = true;
+			}
+
+			caption.update();
+			caption.render();
 
 		break;
 
@@ -456,6 +481,7 @@ public void restartSimulation(){
 	startPerson = 0;
 	startPersonGenerated = false;
 	caption = new Caption();
+	vaccineHintShown = false;
 	sim = new Simulation( windowResolution.x / 2, windowResolution.y / 2, 1 );
 	sim2 = new Simulation ( windowResolution.x / 2, windowResolution.y / 2, 2 );
 

@@ -6,9 +6,9 @@ class Human{
 
 	protected PVector position = new PVector( 0, 0 );
 	protected PVector positionAlteration = new PVector( 0, 0 );
-	protected float myColorRed = 0;
-	protected float myColorGreen = 0;
-	protected float myColorBlue = 200;
+	protected float myColorRed = 2;
+	protected float myColorGreen = 191;
+	protected float myColorBlue = 249;
 	protected float myAlpha = 255;
 	protected float radius = 0;
 	protected float radiusExtended = 0;
@@ -40,8 +40,8 @@ class Human{
 
 		position.x 		= posX;
 		position.y 		= posY;
-		radius			= humanRadius;
-		radiusExtended	= humanRadiusExtended;
+		radius			= humanRadius*2;
+		radiusExtended	= humanRadiusExtended*2;
 		relativeToCamera	= _relativeToCamera;
 
 	}
@@ -141,16 +141,16 @@ class Human{
 				fill( 44, 73, 153 );
 				ellipse( (position.x), 
 					(position.y), 
-					(radius+radiusExtended), 
-					(radius+radiusExtended)
+					(radius+radiusExtended)*2, 
+					(radius+radiusExtended)*2
 					);
 
 				fill( myColorRed, myColorGreen, myColorBlue );
 				ellipse( 
 					(position.x), 
 					(position.y), 
-					(radius), 
-					(radius)
+					(radius)*2, 
+					(radius)*2
 					);
 
 			}
@@ -159,7 +159,7 @@ class Human{
 				fill( myColorRed, myColorGreen, myColorBlue, myAlpha );
 				ellipse( 
 					(position.x), 
-					(position.y), 
+					(position.y)-40, 
 					(radius+radiusExtended), 
 					(radius+radiusExtended)
 					);

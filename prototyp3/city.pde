@@ -67,7 +67,7 @@ class City{
 				startPerson = (int)random( 0, humans.size() ); 
 				int i = startPerson;
 				if( 
-						kindergarden.isInKindergarden(i)
+						kindergarden.isInKindergarden(i) && !( i == 75 || i == 76 || i == 90 || i == 92 || i == 107 || i == 108)
 					){
 					startPersonGenerated = true;
 				}else{

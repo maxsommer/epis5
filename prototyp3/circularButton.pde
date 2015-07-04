@@ -50,6 +50,8 @@ class CircularButton extends Button{
 		}else{
 			fill( myColor );
 		}
+		if( radius > 0 ){
+
 		ellipse( 
 			position.x - sim2.cam.getPosition().x, 
 			position.y - sim2.cam.getPosition().y, 
@@ -65,12 +67,13 @@ class CircularButton extends Button{
 			);
 		image( 
 			playImage, 
-			position.x - (radius - 120)/2 - sim2.cam.getPosition().x, 
-			position.y - (radius-100)/2 - sim2.cam.getPosition().y, 
+			position.x - sim2.cam.getPosition().x, 
+			position.y - sim2.cam.getPosition().y, 
 			radius-100, 
 			radius-100 
 			);
 
+		}
 	}
 
 
@@ -88,6 +91,15 @@ class CircularButton extends Button{
 		}
 
 		return false;
+
+	}
+
+
+	public void reduceSize(){
+
+		if( radius >= 0 ){
+			radius -= 10.0;
+		}
 
 	}
 

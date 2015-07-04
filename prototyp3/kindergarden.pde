@@ -36,7 +36,7 @@ class Kindergarden{
 							isInKindergarden(i)
 						){
 
-							if( percentChance( sim.infectionRate ) ){
+							if( percentChance( sim.infectionRate ) && h != humans.get(91) ){
 
 								h.infect();
 

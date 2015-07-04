@@ -14,7 +14,7 @@ class Caption{
 
 	Human h1 = new Human( windowResolution.x / 7 * 2.4, windowResolution.y - 30, false );
 	Human h2 = new Human( windowResolution.x / 7 * 4.4, windowResolution.y - 30, false );
-	Human h5 = new Human( windowResolution.x / 7 * 3.4, windowResolution.y - 30, false );
+	Human h5 = new Human( windowResolution.x / 7 * 3.4, windowResolution.y - 105, false );
 
 	Caption(){
 
@@ -50,20 +50,25 @@ class Caption{
 		if( healthyVisible ){
 			h1.render();
 			fill(0);
-			text( "Gesund", h1.getPosition().x  + 20, h1.getPosition().y + 2.5 );
+			textSize(18);
+			text( "gesund", h1.getPosition().x  - 30, h1.getPosition().y + 10 );
 		}
 
 		if( infectedVisible ){
 			h2.render();
 			fill(0);
-			text( "Infiziert", h2.getPosition().x  + 20, h2.getPosition().y + 2.5 );
+			textSize(18);
+			text( "krank", h2.getPosition().x  - 20, h2.getPosition().y + 7 );
 		}
 
 		if( vaccinedVisible ){
 			h5.render();
 			fill(0);
-			text( "Geimpft", h5.getPosition().x  + 20, h5.getPosition().y + 2.5 );
+			textSize(18);
+			text( "geimpft", h5.getPosition().x  - 30, h5.getPosition().y + 80 );
 		}
+
+		textSize( 12 );
 
 		h6.render();
 
