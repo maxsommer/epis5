@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 9.3
+//	Prototyp 3, Version 9.3 Trailer
 //
 //	Ablauf der Stati:
 //		-1: 	Starten der Applikation
@@ -416,8 +416,8 @@ public void updateStates(){
 			caption.update();
 			caption.render();
 			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
+			//timeDisplay.update();
+			//timeDisplay.render();
 
 		break;
 
@@ -428,8 +428,8 @@ public void updateStates(){
 			sim.render();
 			sim2.render();
 			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
+			//timeDisplay.update();
+			//timeDisplay.render();
 
 			if( !simulationPauseTimer.paused && !vaccineHintShown ){			
 				fill( 255, 255, 255, 150 );
@@ -457,8 +457,6 @@ public void updateStates(){
 			caption.update();
 			caption.render();
 			//	Zeitleiste
-			timeDisplay.update();
-			timeDisplay.render();
 
 		break;
 
