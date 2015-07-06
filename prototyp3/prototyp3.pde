@@ -6,46 +6,27 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 9.3 Trailer
+//	Prototyp 3, Version 9.5
 //
 //	Ablauf der Stati:
 //		-1: 	Starten der Applikation
 //		0: 	Startscreen
-//		1: 	Kindergarten
-//		2:	Städte
-//		3: 	Erkenntnis
-//		4: 	Neustart der Simulation
-//		5:	
-//		6: 	Übergang Startscreen zu Kindergarten
+//		5:	Maserninfo
+//		6: 	Übergang Maserninfo zu Kindergarten
 //				Virus bewegt sich zum Kindergarten und steckt jemanden an
+//		1: 	Kindergarten
 //		7:	Vorstellung des eigenen Kindes 
 //				Zoom auf das Kind
 //				"Das ist dein Kind"
+//		2:	Städte
+//		3: 	Erkenntnis
+//		4: 	Neustart der Simulation
 //		8: 	Übergang Kindergarten zu Stadt
 //	
 //		
 //	Zu tun:
 //		+ Sound
 //			Die Simulation brauch auch noch Sounds!
-//	
-//		+ Anpassung der Anzahl der Menschen
-//			Aktuell gibt es 217 Menschen pro Simulation. Um beeindruckender zu wirken könnten
-//			wir die Anzahl der Menschen nochmals hochsetzen und diese stattdessen kleiner, mit 
-//			weniger Abstand darstellen
-//	
-//		+ Animation für den Wechsel vom Startscreen zur Kindergartenansicht
-//			Hier soll unser kleiner "Erzähler" in den Kindergarten hineinhüpfen und dann quasi
-//			das erste Kind anstecken. Von da an breitet sich die Krankheit aus
-//
-//		+ Animation der Ansteckung
-//			Ist man gesund, wird man nicht sofort und direkt komplett krank, deshalb soll es eine 
-//			Übergansanimation für jeden einzelnen Menschen geben, die den Prozess zeigt
-//			Dabei wird eine art Linie oder Welle  über den Menschen gezogen, die sich dann immer weiter über
-//			den Kreis von ihm ausbreitet
-//
-//		+ Die Impfinteraktion
-//			Hier wird auf das eigene Kind herangezoomt und man wird gefragt ob es geimpft werden soll oder eben
-//			nicht. Das entscheidet über den weiteren Verlauf der Simulation, besonders am Ende
 //
 //		+ Animation des Erkenntnisscreens
 //			Am Ende soll unser kleiner Virus wieder kommen und nochmals versuchen einen Menschen anzustecken
@@ -74,12 +55,8 @@
 //		+ Gestaltung der Zeitleiste
 //
 //	Neuerungen:
-//		+ Anpassung des Aussehens der Menschen
-//			Wir müssen eine Farbpalette bestimmen und einsetzen um sowohl differenzierbar als auch
-//			"fancy" zu sein. Dabei sollten wir auch darauf achten die Farben gerecht für Farbenblinde auszuwählen
-//
-//		+ Play Button
-//		+ Übergangsanimationen
+//		+ "Maserninfo"
+//		+ Impfen auf beiden Screens
 //		
 //
 //	Probleme:
@@ -87,18 +64,19 @@
 //		dass die Pausieren Funktion anschließend nicht mehr korrekt funktioniert.
 //
 
+import ddf.minim.*;
+
 //	Einstellungen
 //
-PVector windowResolution = new PVector( 1920, 1080 );
+PVector windowResolution = new PVector( 1440, 900 );
 boolean debugMode = false;
-boolean hideCursor = true;
+boolean hideCursor = false;
 
 int framerate = 120;
 boolean fullscreen = true;
 
 //	Globale Variablen
 
-//	-1: Grundzustand, 0: Intro, 1: Kindergarten, 2: Simulation, 3: Outro
 int currentStatus			= -1;
 float timeRelation			=  8.4;
 //	60s = 21 tage
@@ -117,9 +95,11 @@ float numberInfectedRightSimTransition = 70 ;
 Timer simulationPauseTimer		= new Timer( 1500, true );
 float rightTransitionOffset 		= windowResolution.x;
 boolean vaccineHintShown = false;
+boolean vaccinedChildFound = false;
+int vaccinedChild;
 
 //	Testbutton für Touchtisch
-CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 6 );
+CircularButton startButton = new CircularButton( new PVector(windowResolution.x/2, windowResolution.y/2), color( 90,90,90 ), color(40,40,40), 5 );
 PImage playImage;
 
 // 	Virus
@@ -131,7 +111,9 @@ PImage vaccineImage;
 
 //	TimeDisplay
 TimeDisplay timeDisplay = new TimeDisplay();
-PFont Helvetica;
+PFont Pistara72;
+PFont Pistara48;
+PFont Pistara18;
 
 
 //	Hier wird unser Simulationsobjekt erstellt
@@ -160,11 +142,14 @@ void setup(){
 	ellipseMode(CENTER);
 	imageMode(CENTER);
 	//	Schriftart laden
-	Helvetica 	= loadFont("Helvetica-Bold-48.vlw");
+	Pistara18 	= loadFont("Pistara-18.vlw");
+	Pistara48 	= loadFont("Pistara-48.vlw");
+	Pistara72 	= loadFont("Pistara-72.vlw");
 	//	Bilddateien laden
 	virusImage 	= loadImage("virus.png");
 	playImage 	= loadImage("play.png");
 	vaccineImage 	= loadImage("vaccine.png");
+
 	//	textFont( Helvetica );
 	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
 	//	sondern stattdessen lieber nichts
@@ -230,9 +215,19 @@ public void changeStatus( int newstatus ){
 
 	}
 
+	//	Maserninfo screen
+	if( currentStatus == 5 ){
+
+		simulationPauseTimer.reset();
+		simulationPauseTimer.set( 500 );
+		simulationPauseTimer.start();
+
+	}
+
 	//	Übergang Startscreen zu Kindvorstellung
 	if( currentStatus == 6 ){
 
+		virus = new Virus( virus.position );
 		// Kamera nach rechts bewegen, sodass der Kindergarten ins Bild kommt
 		// danach wird dann das eigene Kind vorgestellt in Status 1
 		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 2000 );
@@ -279,9 +274,6 @@ public void changeStatus( int newstatus ){
 		simulationPauseTimer.set( 3000 );
 		simulationPauseTimer.start();
 
-		sim.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
-		sim2.cam.moveTo( new PVector( windowResolution.x, 0 ), 1.0, 1500 );
-
 		//	Übernahme der Simulationsdaten aus dem Kindergarten
 		for( int i = 0; i < sim.city.humans.size(); i++ ){
 
@@ -304,6 +296,57 @@ public void changeStatus( int newstatus ){
 
 	}
 
+	if( currentStatus == 3 ){
+
+		//	Wenn das eigene Kind auf der rechten oder auf beiden Seiten geimpft wurde, dieses
+		//	anzoomen
+		if( 
+			((sim.city.humans.get(91).state == 4) && !( sim2.city.humans.get(91).state == 4) ) ||
+			((sim.city.humans.get(91).state == 4) && ( sim2.city.humans.get(91).state == 4) )
+		){
+
+			PVector pos = sim.city.humans.get(91).getPosition();
+			PVector camera = sim.cam.position;
+			sim.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
+			sim2.cam.moveTo( new PVector(5000, 5000), 4.0, 1500 );
+			vaccinedChild = 91;
+
+		}
+		//	Wenn das eigene Kind auf der linken Seite geimpft wurde, dieses
+		//	anzoomen
+		else if ( sim2.city.humans.get(91).state == 4 && !( sim.city.humans.get(91).state == 4) ){
+
+			PVector pos = sim2.city.humans.get(91).getPosition();
+			PVector camera = sim2.cam.position;
+			sim2.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
+			sim.cam.moveTo( new PVector(5000, 5000), 4.0, 1500 );
+			vaccinedChild = 91;
+
+		}
+		//	Wenn das eigene Kind auf keine der beiden Seiten geimpft wurde
+		else if(  !(sim.city.humans.get(91).state == 4) && !(sim2.city.humans.get(91).state == 4) ){
+
+			//	einen geimpften Menschen finden 
+			int i = 0;
+			while( !vaccinedChildFound ){
+				if( sim.city.humans.get(i).state == 4 ){
+					vaccinedChildFound = true;
+					vaccinedChild = i;
+				}
+				i++;
+			}
+
+			//	und auf ihn zoomen
+			PVector pos = sim.city.humans.get(i).getPosition();
+			PVector camera = sim.cam.position;
+			sim.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
+			sim2.cam.moveTo( new PVector(5000, 5000), 4.0, 1500 );
+
+		}
+		virus.moveTo( windowResolution.x / 2  + sim2.cam.position.x , windowResolution.y/2 + sim2.cam.position.y, 1000);
+
+	}
+
 	if( currentStatus == 8 ){
 
 
@@ -318,16 +361,6 @@ public void updateTimers(){
 
 	simulationPauseTimer.isAlive();
 
-}
-
-
-public void playStartScreenAnimation(){
-/*
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 +50, 700, 2 );
-	virus.moveTo( windowResolution.x/2 + 100, windowResolution.y/2 + 200, 700, 3 );
-	virus.moveTo( windowResolution.x/2 + 50, windowResolution.y/2 + 0, 1000, 2 );
-	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
-*/
 }
 
 
@@ -360,6 +393,21 @@ public void updateStates(){
 
 		break;
 
+		case( 5 ):
+			virus.update();
+			virus.render();
+
+			//	Button 
+			startButton.reduceSize();
+			startButton.render();
+
+			if( simulationPauseTimer.completed ){
+				changeStatus( 6 );
+			}else{
+				showInfoScreen();
+			}
+		break;
+
 		case(6):
 		
 			sim.update();
@@ -368,17 +416,9 @@ public void updateStates(){
 			sim2.render();
 			caption.update();
 			caption.render();
-			//	Zeitleiste
 			virus.update();
 			virus.render();
-
-			if( !virus.hasInQueue() ){
-				playStartScreenAnimation();
-			}
-
-			//	Button 
-			startButton.reduceSize();
-			startButton.render();
+			showInfoScreen();
 
 			if( simulationPauseTimer.completed ){
 				changeStatus( 1 );
@@ -397,8 +437,9 @@ public void updateStates(){
 			virus.update();
 			virus.render();
 			textSize( 48 );
-			textFont( Helvetica);
-			text( thisIsYourChild, windowResolution.x / 2 - 50, 200 );
+			textFont( Pistara48 );
+			fill(0);
+			text( thisIsYourChild, sim2.city.humans.get(91).getPosition().x - sim2.cam.position.x + windowResolution.x / 4 + 154, windowResolution.y/2 - 190 );
 			textSize( 12 );
 
 			if( simulationPauseTimer.completed ){
@@ -422,22 +463,26 @@ public void updateStates(){
 		break;
 
 		case(2):
-
-			sim.update();
-			sim2.update();
-			sim.render();
-			sim2.render();
 			//	Zeitleiste
 			//timeDisplay.update();
 			//timeDisplay.render();
 
-			if( !simulationPauseTimer.paused && !vaccineHintShown ){			
-				fill( 255, 255, 255, 150 );
-				rect( 0, 0, windowResolution.x, windowResolution.y-60 );
+			if( !simulationPauseTimer.paused && !vaccineHintShown ){	
+				sim.render();
+				sim2.render();		
+				fill( 255, 255, 255, 180 );
+				rect( 0, 0, windowResolution.x, windowResolution.y-140 );
+				textFont( Pistara48 );
 				textSize(48);
 				fill(0);
 				text( vaccineYourChild, windowResolution.x/2 - 300, windowResolution.y/2 );
 				textSize( 12 );
+			}
+			else{
+				sim.update();
+				sim2.update();
+				sim.render();
+				sim2.render();
 			}
 			if(simulationPauseTimer.completed){
 				vaccineHintShown = true;
@@ -454,9 +499,19 @@ public void updateStates(){
 			sim2.update();
 			sim.render();
 			sim2.render();
-			caption.update();
-			caption.render();
-			//	Zeitleiste
+				fill( 255, 255, 255, 180 );
+				rect( 0, 0, windowResolution.x, windowResolution.y );
+			virus.update();
+			virus.render();
+				if( sim.city.humans.get(91).state == 4 ){
+					sim.city.humans.get(91).render();
+				}
+				else if ( sim2.city.humans.get(91).state == 4 ){
+					sim2.city.humans.get(91).render();
+				}
+				else{
+					sim.city.humans.get(vaccinedChild).render();
+				}
 
 		break;
 
@@ -548,19 +603,6 @@ public void keyPressed(){
 
 		break;
 
-		case 'n':
-		case 'N':
-			//	Hier wird zwischen den Stati der Applikation, also in welcher Phase
-			//	man sich gerade befindet umgeschaltet. Mögliche Stati sind zB
-			//	Intro, Kindergarten, Simulation oder Outro
-			if( currentStatus < 3 ){
-				changeStatus( (currentStatus+1) );
-			}
-			else{
-				restartSimulation();
-			}
-		break;
-
 	}
 
 }
@@ -569,6 +611,8 @@ public void keyPressed(){
 public void renderDebugInfo(){
 
 		if( debugMode ){
+			textFont( Pistara18 );
+			textSize( 12 );
 
 			fill( 0, 0, 230 );
 			text(frameRate+"fps", 20, 20);
@@ -612,5 +656,25 @@ public void renderDebugInfo(){
 			text("Press 'n' to switch between states", 20, 140);
 
 		}
+
+}
+
+
+public void playStartScreenAnimation(){
+
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 +150, 700, 2 );
+	virus.moveTo( windowResolution.x/2 + 100, windowResolution.y/2 + 300, 700, 3 );
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 50, 1000, 2 );
+	virus.moveTo( windowResolution.x/2 + 0, windowResolution.y/2 + 150, 1000, 3 );
+
+}
+
+
+public void showInfoScreen(){
+
+	textSize( 48 );
+	textFont( Pistara48 );
+	fill( 0 );
+	text( measlesInfo, windowResolution.x/2-50 - sim2.cam.getPosition().x, windowResolution.y/2 - 200 - sim2.cam.getPosition().y);
 
 }

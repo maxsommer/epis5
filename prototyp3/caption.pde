@@ -44,27 +44,30 @@ class Caption{
 		//	werden
 		if( healthyVisible || infectedVisible || vaccinedVisible ){
 			fill(255, 200);
-			rect( 0, windowResolution.y - 60, windowResolution.x, 60 );
+			rect( 0, windowResolution.y - 140, windowResolution.x, 140 );
 		}
 
 		if( healthyVisible ){
 			h1.render();
 			fill(0);
-			textSize(18);
+			textFont( Pistara48 );
+			textSize(24);
 			text( "gesund", h1.getPosition().x  - 30, h1.getPosition().y + 10 );
 		}
 
 		if( infectedVisible ){
 			h2.render();
 			fill(0);
-			textSize(18);
+			textFont( Pistara48 );
+			textSize(24);
 			text( "krank", h2.getPosition().x  - 20, h2.getPosition().y + 7 );
 		}
 
 		if( vaccinedVisible ){
 			h5.render();
 			fill(0);
-			textSize(18);
+			textFont( Pistara48 );
+			textSize(24);
 			text( "geimpft", h5.getPosition().x  - 30, h5.getPosition().y + 80 );
 		}
 
@@ -87,7 +90,8 @@ class Caption{
 
 		//	Ist der Dragmodus aktiviert, so soll h6 der Maus folgen
 		if( dragMode 
-			&& PVector.dist( new PVector(sim2.cam.getPosition().x+mouseX, sim2.cam.getPosition().y+mouseY), sim2.city.humans.get(91).getPosition() ) > 200  
+			&& PVector.dist( new PVector(sim2.cam.getPosition().x+mouseX, sim2.cam.getPosition().y+mouseY), sim2.city.humans.get(91).getPosition() ) > 200   
+			&& PVector.dist( new PVector(sim.cam.getPosition().x+mouseX, sim.cam.getPosition().y+mouseY), sim.city.humans.get(91).getPosition() ) > 200   
 		){
 			h6.setPosition( new PVector( mouseX, mouseY ) );
 		}
@@ -115,6 +119,32 @@ class Caption{
 					)
 				);
 		}
+
+
+		//	Ist der Dragmodus aktiviert und die Maus nahe am Kind so soll der VaccineRing nahe an h6 sein
+		if( dragMode 
+			&& PVector.dist( new PVector(sim.cam.getPosition().x+mouseX, sim.cam.getPosition().y+mouseY), sim.city.humans.get(91).getPosition() ) <= 200  
+			&& PVector.dist( new PVector(sim.cam.getPosition().x+mouseX, sim.cam.getPosition().y+mouseY), sim.city.humans.get(91).getPosition() ) > 100
+		){
+			PVector pv1 = 	PVector.sub( 
+							new PVector(sim.cam.getPosition().x+ mouseX,sim.cam.getPosition().y+ mouseY) ,
+							sim.city.humans.get(91).getPosition()
+							);
+			pv1.normalize();
+			h6.setPosition( 
+				PVector.add(
+					PVector.mult(
+						pv1,
+						50), 
+					PVector.sub(
+						sim.city.humans.get(91).getPosition() ,
+						sim.cam.getPosition()
+						)
+					)
+				);
+		}
+
+
 				//	Ist der Dragmodus aktiviert und die Maus nahe am Kind so soll der VaccineRing nahe an h6 sein
 		if( dragMode 
 			&& PVector.dist( new PVector(sim2.cam.getPosition().x+mouseX, sim2.cam.getPosition().y+mouseY), sim2.city.humans.get(91).getPosition() ) <= 100  
@@ -128,11 +158,24 @@ class Caption{
 		}
 
 
+				//	Ist der Dragmodus aktiviert und die Maus nahe am Kind so soll der VaccineRing nahe an h6 sein
+		if( dragMode 
+			&& PVector.dist( new PVector(sim.cam.getPosition().x+mouseX, sim.cam.getPosition().y+mouseY), sim.city.humans.get(91).getPosition() ) <= 100  
+		){
+			h6.setPosition( 
+					PVector.sub(
+						sim.city.humans.get(91).getPosition() ,
+						sim.cam.getPosition()
+						)
+					);
+		}
+
 
 		//	Falls die Maus losgelassen wurde, so wird der Dragmodus ausgeschaltet
 		if(  
 			!mousePressed && mousePressedBefore &&  
-			PVector.dist( new PVector(sim2.cam.getPosition().x+mouseX, sim2.cam.getPosition().y+mouseY), sim2.city.humans.get(91).getPosition() ) > 200  
+			PVector.dist( new PVector(sim2.cam.getPosition().x+mouseX, sim2.cam.getPosition().y+mouseY), sim2.city.humans.get(91).getPosition() ) > 200   &&  
+			PVector.dist( new PVector(sim.cam.getPosition().x+mouseX, sim.cam.getPosition().y+mouseY), sim.city.humans.get(91).getPosition() ) > 200  
 		
 		){
 			dragMode = false;
@@ -148,7 +191,21 @@ class Caption{
 		){
 			dragMode = false;
 			h6.setPosition( new PVector( - 500, -500 ) );	
-			sim2.city.humans.get(91).vaccinate();
+			if( !sim2.city.humans.get(91).isInfecting() )
+				sim2.city.humans.get(91).vaccinate();
+		}
+
+
+		//	Falls die Maus losgelassen wurde innerhalb des "Aktionsraumes", dann bitte impfen!
+		if(  
+			!mousePressed && mousePressedBefore &&  
+			PVector.dist( new PVector(sim.cam.getPosition().x+mouseX, sim.cam.getPosition().y+mouseY), sim.city.humans.get(91).getPosition() ) <= 200  
+		
+		){
+			dragMode = false;
+			h6.setPosition( new PVector( - 500, -500 ) );	
+			if( !sim.city.humans.get(91).isInfecting() )
+				sim.city.humans.get(91).vaccinate();
 		}
 
 

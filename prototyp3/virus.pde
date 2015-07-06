@@ -67,6 +67,13 @@ class Virus{
 	}
 
 
+	public void clearList(){
+
+		moveList = new ArrayList<VirusTarget>();
+
+	}
+
+
 	public void updateMovement(){
 
 		//	Entspricht die Position nicht der Zielposition soll das Virus noch bewegt werden

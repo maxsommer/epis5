@@ -81,20 +81,35 @@ class Human{
 
 		}
 
-		//	Farbe einstellen, je nach Status
-		if(state == 0){		//	Gesund
-			myColorRed = 2;
-			myColorGreen = 191;
-			myColorBlue = 249;
-		}else if(state == 1 || state == 2 || state == 3){	//	Infiziert
-			myColorRed = 239;
-			myColorGreen = 42;
-			myColorBlue = 22;
-		}else if(state == 4){	// 	Geimpft
-			myColorRed = 2;
-			myColorGreen = 191;
-			myColorBlue = 249;
-		}
+		    //	Farbe einstellen, je nach Status
+		    if (state == 0) {		//	Gesund
+		      myColorRed = 2;
+		      myColorGreen = 191;
+		      myColorBlue = 249;
+		    } else if (state == 1) {	//	Infiziert ohne Symptome
+		      float colorTimer =  timer.getTimer();  
+		      if (colorTimer <= 2000) {  //umfärbung über 4 sekunden
+		        myColorRed = int (2 + ((colorTimer*237)/700));
+		        myColorGreen = int (191 - ((colorTimer*149)/700));
+		        myColorBlue = int (249 - ((colorTimer*227)/700));
+		      } else {
+		        myColorRed = 239;
+		        myColorGreen = 42;
+		        myColorBlue = 22;
+		      }
+		    } else if (state == 2) {  //  Infiziert mit Symptome
+		      myColorRed = 239;
+		      myColorGreen = 42;
+		      myColorBlue = 22;
+		    } else if (state == 3) {  //  Infiziert im Krankenhaus
+		      myColorRed = 239;
+		      myColorGreen = 42;
+		      myColorBlue = 22;
+		    } else if (state == 4) {	// 	Geimpft
+		      myColorRed = 2;
+		      myColorGreen = 191;
+		      myColorBlue = 249;
+		    }
 
 	}
 
@@ -151,6 +166,17 @@ class Human{
 					(position.y), 
 					(radius)*2, 
 					(radius)*2
+					);
+
+			}
+			else if(state == 1 || state == 2 || state == 3){
+
+				fill( 239, 42, 22, myAlpha );
+				ellipse( 
+					(position.x), 
+					(position.y)-40, 
+					(radius+radiusExtended), 
+					(radius+radiusExtended)
 					);
 
 			}

@@ -32,7 +32,7 @@ class Button{
 		}
 
 		if( checkReleased() ){
-			myEvent.changeApplicationStatus( 1 );
+			myEvent.changeApplicationStatus( 5 );
 			changeButtonStatus( false );
 		}
 

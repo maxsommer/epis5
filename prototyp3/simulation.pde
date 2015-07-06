@@ -12,8 +12,8 @@ class Simulation{
 
 	boolean paused = false;
 
-	float infectionRange 	= 90;
-	float infectionRate 	= 0.03;
+	float infectionRange 	= 90; //=90;//
+	float infectionRate 	= 0.03;//=0.2;//
 	float vaccinationCoverage = 63;
 
 	//	Der Konstrukt erwartet zwei Parameter, die X & Y 

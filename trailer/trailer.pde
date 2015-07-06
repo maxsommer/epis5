@@ -6,7 +6,7 @@ float pulse = 0;
 PFont Helvetica;
 void setup(){
 
-	size( 1920, 1080, P2D );
+	size( 1440, 900, P2D );
 	vaccineImage 	= loadImage("vaccine.png");
 	screenm 	= loadImage("screen.png");
 	Helvetica 	= loadFont("HelveticaNeue-Bold-72.vlw");
@@ -38,7 +38,7 @@ void draw(){
 					);
 				fill(0);
 				textSize( 18 );
-				text( "gesund", 768-384*0.5  - 30, 1060 );
+				text( "gesund", 768-384*0.5  - 30, 860 );
 
 				fill( 239, 42, 22 );
 				ellipse( 
@@ -49,7 +49,7 @@ void draw(){
 					);
 				fill(0);
 				textSize( 18 );
-				text( "krank", 1536-384*0.5  - 20, 1060 );
+				text( "krank", 1536-384*0.5  - 20, 860 );
 
 
 	fill(255, 120);
@@ -63,7 +63,7 @@ void draw(){
 
 				fill( 44, 73, 153 );
 				ellipse( (1152 - 384*0.5), 
-					(980), 
+					(780), 
 					(28+20)*2 + size, 
 					(28+20)*2 + size
 					);
@@ -71,14 +71,14 @@ void draw(){
 				fill( 2, 191, 249 );
 				ellipse( 
 					(1152 - 384*0.5), 
-					(980), 
+					(780), 
 					(28)*2 + size, 
 					(28)*2 + size
 					);
 
 				fill(0);
 				textSize( 18 );
-				text( "geimpft", 1152-384*0.5  - 30, 1060 );
+				text( "geimpft", 1152-384*0.5  - 30, 860 );
 
 		textSize(72);
 		fill( 50 );
