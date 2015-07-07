@@ -329,31 +329,33 @@ public void changeStatus( int newstatus ){
 			((sim.city.humans.get(91).state == 4) && ( sim2.city.humans.get(91).state == 4) )
 		){
 
+			virus.clearList();
+			playRestartScreenAnimation();
 			PVector pos = sim.city.humans.get(91).getPosition();
 			PVector camera = sim.cam.position;
 			sim.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
 			sim2.cam.moveTo( new PVector(9000, 9000), 1.0, 1500 );
-			virus.moveTo( pos.x , pos.y, 1000);
 			vaccinedChild = 91;
-			println( pos.x );
-			println( virus.position.x );
 
 		}
 		//	Wenn das eigene Kind auf der linken Seite geimpft wurde, dieses
 		//	anzoomen
 		else if ( sim2.city.humans.get(91).state == 4 && !( sim.city.humans.get(91).state == 4) ){
 
+			virus.clearList();
+			playRestartScreenAnimation();
 			PVector pos = sim2.city.humans.get(91).getPosition();
 			PVector camera = sim2.cam.position;
 			sim2.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
 			sim.cam.moveTo( new PVector(9000, 9000), 1.0, 1500 );
-			virus.moveTo( pos.x + camera.x , pos.y + camera.x, 1000);
 			vaccinedChild = 91;
 
 		}
 		//	Wenn das eigene Kind auf keine der beiden Seiten geimpft wurde
 		else if(  !(sim.city.humans.get(91).state == 4) && !(sim2.city.humans.get(91).state == 4) ){
 
+			virus.clearList();
+			playRestartScreenAnimation();
 			//	einen geimpften Menschen finden 
 			int i = 0;
 			while( !vaccinedChildFound ){
@@ -369,14 +371,8 @@ public void changeStatus( int newstatus ){
 			PVector camera = sim.cam.position;
 			sim.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
 			sim2.cam.moveTo( new PVector(9000, 9000), 1.0, 1500 );
-			virus.moveTo( pos.x + camera.x , pos.y + camera.x, 1000);
 
 		}
-
-	}
-
-	if( currentStatus == 8 ){
-
 
 	}
 
@@ -592,6 +588,8 @@ public void updateStates(){
 			restartButton.update();
 			restartButton.render();
 
+			println( virus.position.x );
+
 			virus.update();
 			virus.render();
 
@@ -772,23 +770,6 @@ public void playStartScreenAnimation(){
 
 
 public void playRestartScreenAnimation(){
-
-	virus.moveTo( 	windowResolution.x/2 + 0, 	windowResolution.y/2 +150, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 + 200, 	windowResolution.y/2 + 300, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 + 80, 	windowResolution.y/2 + 125, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 + 300, 	windowResolution.y/2 + 0, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 + 150, 	windowResolution.y/2 - 0, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 + 200, 	windowResolution.y/2 - 300, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 + 80, 	windowResolution.y/2 - 125, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 - 0, 	windowResolution.y/2 - 300, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 - 0, 	windowResolution.y/2 - 125, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 - 200, 	windowResolution.y/2 - 200, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 - 125, 	windowResolution.y/2 - 80, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 - 300, 	windowResolution.y/2 - 0, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 - 150, 	windowResolution.y/2 - 0, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 - 200, 	windowResolution.y/2 + 300, 700, 3 );
-	virus.moveTo( 	windowResolution.x/2 - 80, 	windowResolution.y/2 + 125, 500, 2 );
-	virus.moveTo( 	windowResolution.x/2 - 0, 	windowResolution.y/2 + 300, 700, 3 );
 
 }
 

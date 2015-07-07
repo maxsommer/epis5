@@ -148,7 +148,7 @@ class Virus{
 	//	hier wird der Virus angezeigt
 	public void render(){
 
-		if( currentStatus != 11 ){
+		if( currentStatus != 3 ){
 
 			//	hier Gestaltung vom Virus!
 			fill( myColor );
@@ -168,7 +168,6 @@ class Virus{
 				(virusImage.width / 2) * sim.cam.getZoom() * size, 
 				(virusImage.height / 2)  * sim.cam.getZoom() * size
 				);
-			println( (position.x - sim.cam.getPosition().x) * sim.cam.getZoom() );
 
 		}
 
