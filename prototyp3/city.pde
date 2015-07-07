@@ -117,11 +117,11 @@ class City{
 
 	public void render(){
 
-		if( this.mySim == sim2 && (currentStatus == 1 || currentStatus == 6 || currentStatus == 7) ){
+		if( this.mySim == sim2 && (currentStatus == 1 || currentStatus == 6 || currentStatus == 7 ) ){
 			kindergarden.render();
 		}
 
-		if( currentStatus == 2 || currentStatus == 3 ){
+		if( currentStatus == 9 || currentStatus == 10 || currentStatus == 2 || currentStatus == 3 ){
 
 			//	Alle Menschen rendern
 			for( int i = 0; i < humans.size(); i++ ){

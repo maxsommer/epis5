@@ -14,6 +14,7 @@ class Human{
 	protected float radiusExtended = 0;
 	protected boolean relativeToCamera = true;
 	protected Simulation mySim;
+	protected float pulse = 0.0;
 
 	//	Status der Person; 0: gesund, 1: infiziert, aber ohne anzeichen, 2: infiziert, mit anzeichen, 3: im Krankenhaus, 4: geimpft
 	protected int state = 0;
@@ -153,20 +154,42 @@ class Human{
 
 			if( state == 4 ){
 
-				fill( 44, 73, 153 );
-				ellipse( (position.x), 
-					(position.y), 
-					(radius+radiusExtended)*2, 
-					(radius+radiusExtended)*2
-					);
+				if( currentStatus == 10 ){
 
-				fill( myColorRed, myColorGreen, myColorBlue );
-				ellipse( 
-					(position.x), 
-					(position.y), 
-					(radius)*2, 
-					(radius)*2
-					);
+					pulse+= 0.02;
+
+					fill( 44, 73, 153 );
+					ellipse( (position.x), 
+						(position.y), 
+						(radius+radiusExtended)*(2 + 0.5*sin(pulse)), 
+						(radius+radiusExtended)*(2 + 0.5*sin(pulse))
+						);
+
+					fill( myColorRed, myColorGreen, myColorBlue );
+					ellipse( 
+						(position.x), 
+						(position.y), 
+						(radius)*(2 + 0.5*sin(pulse)),  
+						(radius)*(2 + 0.5*sin(pulse))
+						);
+				}
+				else{				
+
+					fill( 44, 73, 153 );
+					ellipse( (position.x), 
+						(position.y), 
+						(radius+radiusExtended)*2,
+						(radius+radiusExtended)*2
+						);
+
+					fill( myColorRed, myColorGreen, myColorBlue );
+					ellipse( 
+						(position.x), 
+						(position.y), 
+						(radius)*2 ,  
+						(radius)*2
+						);
+				}
 
 			}
 			else if(state == 1 || state == 2 || state == 3){

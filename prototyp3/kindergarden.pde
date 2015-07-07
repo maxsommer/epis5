@@ -85,7 +85,7 @@ class Kindergarden{
 		}
 
 		if( numberInfectedKindergarden >= numberInfectedKindergardenTransition ){
-			changeStatus( 2 );
+			changeStatus( 9 );
 		}
 
 	}

@@ -35,7 +35,12 @@ class CircularButton extends Button{
 		}
 
 		if( checkReleased() ){
-			myEvent.changeApplicationStatus( status );
+			if( status != 11 ){
+				myEvent.changeApplicationStatus( status );
+			}
+			else{
+				restartSimulation();
+			}
 			changeButtonStatus( false );
 		}
 
@@ -51,7 +56,7 @@ class CircularButton extends Button{
 			fill( myColor );
 		}
 		if( radius > 0 ){
-
+		if( status != 11 ){
 		ellipse( 
 			position.x - sim2.cam.getPosition().x, 
 			position.y - sim2.cam.getPosition().y, 
@@ -65,13 +70,36 @@ class CircularButton extends Button{
 			radius + 50 , 
 			radius + 50 
 			);
-		image( 
-			playImage, 
-			position.x - sim2.cam.getPosition().x, 
-			position.y - sim2.cam.getPosition().y, 
-			radius-100, 
-			radius-100 
+			image( 
+				playImage, 
+				position.x - sim2.cam.getPosition().x, 
+				position.y - sim2.cam.getPosition().y, 
+				radius-100, 
+				radius-100 
+				);
+		}
+		else{
+		ellipse( 
+			position.x, 
+			position.y, 
+			radius - 100, 
+			radius - 100 
 			);
+		fill( 90, 90, 90, 200 );
+		ellipse( 
+			position.x, 
+			position.y, 
+			radius -50 , 
+			radius - 50 
+			);
+			image( 
+				replayImage, 
+				position.x-5, 
+				position.y, 
+				radius-150, 
+				radius-150 
+				);
+		}
 
 		}
 	}

@@ -148,14 +148,29 @@ class Virus{
 	//	hier wird der Virus angezeigt
 	public void render(){
 
-		//	hier Gestaltung vom Virus!
-		fill( myColor );
-		image( virusImage,
-			(position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
-			(position.y - sim2.cam.getPosition().y) * sim2.cam.getZoom(),
-			(virusImage.width / 2) * sim2.cam.getZoom() * size, 
-			(virusImage.height / 2)  * sim2.cam.getZoom() * size
-			);
+		if( currentStatus != 11 ){
+
+			//	hier Gestaltung vom Virus!
+			fill( myColor );
+			image( virusImage,
+				(position.x - sim2.cam.getPosition().x) * sim2.cam.getZoom(), 
+				(position.y - sim2.cam.getPosition().y) * sim2.cam.getZoom(),
+				(virusImage.width / 2) * sim2.cam.getZoom() * size, 
+				(virusImage.height / 2)  * sim2.cam.getZoom() * size
+				);
+
+		}else{
+
+			fill( myColor );
+			image( virusImage,
+				(position.x - sim.cam.getPosition().x) * sim.cam.getZoom(), 
+				(position.y - sim.cam.getPosition().y) * sim.cam.getZoom(),
+				(virusImage.width / 2) * sim.cam.getZoom() * size, 
+				(virusImage.height / 2)  * sim.cam.getZoom() * size
+				);
+			println( (position.x - sim.cam.getPosition().x) * sim.cam.getZoom() );
+
+		}
 
 	}
 

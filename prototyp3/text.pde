@@ -1,3 +1,9 @@
-String thisIsYourChild =  "Das ist dein Kind";//"Das ist dein Kind";
-String vaccineYourChild = "Jetzt kannst du dein Kind impfen!";
-String measlesInfo = "Masern";
+String thisIsYourChild 		=  "Das ist dein Kind";//"Das ist dein Kind";
+String vaccineYourChild 	= "Jetzt kannst du dein Kind impfen!";
+String measlesInfo 		= "Masern";
+String measlesInfoExtended 	= "Nur etwa 63% der Deutschen sind gegen die Masern geimpft, \ndoch diese sind eine hochansteckende Krankheit, aufgrund \n der viele Menschen ins Krankenhaus müssen. \nWir möchten Sie zum Nachdenken anregen.";
+String kindergardenText 	= "Kindergarten";
+String cityText			= "Dieburg";
+String zeroPercentText 	= "0% Impfquote";
+String realPercentText 		= "63% Impfquote";
+String vacciningHelps		= "Nur Impfen schützt";
