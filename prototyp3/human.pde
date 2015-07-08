@@ -89,7 +89,7 @@ class Human{
 		      myColorBlue = 249;
 		    } else if (state == 1) {	//	Infiziert ohne Symptome
 		      float colorTimer =  timer.getTimer();  
-		      if (colorTimer <= 2000) {  //umfärbung über 4 sekunden
+		      if (colorTimer <= 700) {  //umfärbung über 4 sekunden
 		        myColorRed = int (2 + ((colorTimer*237)/700));
 		        myColorGreen = int (191 - ((colorTimer*149)/700));
 		        myColorBlue = int (249 - ((colorTimer*227)/700));

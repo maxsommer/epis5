@@ -78,7 +78,7 @@ class Virus{
 	public void updateMovement(){
 
 		//	Entspricht die Position nicht der Zielposition soll das Virus noch bewegt werden
-		if( PVector.dist( position, targetPosition ) > 10 ){
+		if( PVector.dist( position, targetPosition ) > 12 ){
 
 			if( !isMoving ){
 				myTimer.set( moveTime );

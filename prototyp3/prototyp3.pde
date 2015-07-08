@@ -155,7 +155,7 @@ void setup(){
 	//	Bilddateien laden
 	virusImage 		= loadImage("virus.png");
 	playImage 		= loadImage("play.png");
-	replayImage 		= loadImage("replay.png");
+	replayImage 		= loadImage("replay2.png");
 	vaccineImage 		= loadImage("vaccine.png");
 
 	//	textFont( Helvetica );
@@ -231,7 +231,7 @@ public void changeStatus( int newstatus ){
 		playInfoScreenAnimation();
 
 		simulationPauseTimer.reset();
-		simulationPauseTimer.set( 6500 );
+		simulationPauseTimer.set( 8000 );
 		simulationPauseTimer.start();
 
 	}
@@ -309,7 +309,7 @@ public void changeStatus( int newstatus ){
 	if( currentStatus == 10 ){
 
 		simulationPauseTimer.reset();
-		simulationPauseTimer.set( 7000 );
+		simulationPauseTimer.set( 9000 );
 		simulationPauseTimer.start();
 
 		caption.vaccinedVisible = true;
@@ -781,10 +781,8 @@ public void playRestartScreenAnimation(){
 
 public void playInfoScreenAnimation(){
 
-	virus.moveTo( windowResolution.x/2 -300 - sim2.cam.getPosition().x, windowResolution.y/2 - 230 - sim2.cam.getPosition().y, 1000 );
-	virus.moveTo( windowResolution.x/2+ 0 - sim2.cam.getPosition().x, windowResolution.y/2 - 250 - sim2.cam.getPosition().y, 1000 );
-	virus.moveTo( windowResolution.x/2+ 300 - sim2.cam.getPosition().x, windowResolution.y/2 - 230 - sim2.cam.getPosition().y, 1000 );
-	virus.moveTo( windowResolution.x/2+ 0 - sim2.cam.getPosition().x, windowResolution.y/2 - 250 - sim2.cam.getPosition().y, 1000 );
+	virus.moveTo( windowResolution.x/2 -300 - sim2.cam.getPosition().x, windowResolution.y/2 - 230 - sim2.cam.getPosition().y, 4000 );
+	virus.moveTo( windowResolution.x/2+ 300 - sim2.cam.getPosition().x, windowResolution.y/2 - 230 - sim2.cam.getPosition().y, 5000 );
 
 
 

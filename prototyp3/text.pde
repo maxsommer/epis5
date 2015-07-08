@@ -6,4 +6,4 @@ String kindergardenText 	= "Kindergarten";
 String cityText			= "Dieburg";
 String zeroPercentText 	= "0% Impfquote";
 String realPercentText 		= "64,5% Impfquote";
-String vacciningHelps		= "Impfen schützt dein Kind am besten!";
+String vacciningHelps		= "Impfen schützt dein Kind am Besten!";
