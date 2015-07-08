@@ -12,9 +12,9 @@ class Caption{
 	boolean dragMode = false;
 	VaccineRing h6;
 
-	Human h1 = new Human( windowResolution.x / 7 * 2.4, windowResolution.y - 30, false );
-	Human h2 = new Human( windowResolution.x / 7 * 4.4, windowResolution.y - 30, false );
-	Human h5 = new Human( windowResolution.x / 7 * 3.4, windowResolution.y - 105, false );
+	Human h1 = new Human( windowResolution.x / 7 * 2.4, windowResolution.y - 70, false );
+	Human h2 = new Human( windowResolution.x / 7 * 4.4, windowResolution.y - 70, false );
+	Human h5 = new Human( windowResolution.x / 7 * 3.4, windowResolution.y - 145, false );
 
 	Caption(){
 
@@ -44,31 +44,31 @@ class Caption{
 		//	werden
 		if( healthyVisible || infectedVisible || vaccinedVisible ){
 			fill(255, 200);
-			rect( 0, windowResolution.y - 140, windowResolution.x, 140 );
+			rect( 0, windowResolution.y - 160, windowResolution.x, 160 );
 		}
 
 		if( healthyVisible ){
 			h1.render();
 			fill(0);
-			textFont( Pistara48 );
+			textFont( HelveticaNeue48 );
 			textSize(24);
-			text( "gesund", h1.getPosition().x  - 30, h1.getPosition().y + 10 );
+			text( "gesund", h1.getPosition().x  - 40, h1.getPosition().y + 15 );
 		}
 
 		if( infectedVisible ){
 			h2.render();
 			fill(0);
-			textFont( Pistara48 );
+			textFont( HelveticaNeue48 );
 			textSize(24);
-			text( "krank", h2.getPosition().x  - 20, h2.getPosition().y + 7 );
+			text( "krank", h2.getPosition().x  - 30, h2.getPosition().y + 12 );
 		}
 
 		if( vaccinedVisible ){
 			h5.render();
 			fill(0);
-			textFont( Pistara48 );
+			textFont( HelveticaNeue48 );
 			textSize(24);
-			text( "geimpft", h5.getPosition().x  - 30, h5.getPosition().y + 80 );
+			text( "geimpft", h5.getPosition().x  - 40, h5.getPosition().y + 85 );
 		}
 
 		textSize( 12 );
@@ -83,7 +83,7 @@ class Caption{
 		//	Falls die Maus gedrückt wurde innerhalb von einem Radius von 25 um 
 		//	das Legendenelement "Geimpft", so wird der Dragmodus angeschaltet
 		if( 	mousePressed && !mousePressedBefore &&
-			PVector.dist( new PVector( mouseX, mouseY), h5.getPosition() ) <= 25){
+			PVector.dist( new PVector( mouseX, mouseY), h5.getPosition() ) <= 60){
 			dragMode = true;
 		}
 

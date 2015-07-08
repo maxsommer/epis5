@@ -9,7 +9,7 @@ class TimeDisplay{
 	private color myColor;							//	Farbe der Anzeige
 	private Timer myTimer 		= new Timer();				//	Timer für die Messung der Realzeit
 	private float myWidth = 0;						//	Breite des Zeitstrahls
-	private float maxWidth = windowResolution.x / 5 - 50; 			// 	Maximale Breite des Zeitstrahls
+	private float maxWidth = windowResolution.x; 				// 	Maximale Breite des Zeitstrahls
 	//	Zeitspeicherung
 	private float weeks = 0;							//	Wochen	
 	private float days = 0;							// 	Tage
@@ -19,8 +19,8 @@ class TimeDisplay{
 
 	TimeDisplay(){
 
-		position	= new PVector( windowResolution.x / 5 * 4, windowResolution.y - 40 );
-		myColor	= color(0, 200, 0);
+		position	= new PVector( 0, windowResolution.y - 40 );
+		myColor	= color( 90, 90, 90 );
 
 	}
 
@@ -47,11 +47,17 @@ class TimeDisplay{
 	public void render(){
 
 		fill( myColor );
-		rect( position.x, position.y, myWidth, 20 );
+		rect( position.x, position.y, myWidth, 60 );
 		fill(myColor, 50);
-		rect( position.x, position.y, maxWidth, 20 );
-		fill( 0 );
-		text( "Tag " + (int)days, position.x + 50, position.y + 15);
+		rect( position.x, position.y, maxWidth, 60 );
+		fill( 255 );
+		textFont( HelveticaNeue48 );
+		textSize( 30 );
+		if( myWidth < windowResolution.x ){
+			text( "Tag " + (int)days, myWidth / 2 - 50, position.y + 30);
+		}else{
+			text( "Tag " + (int)days, windowResolution.x / 2 - 50, position.y + 30);
+		}
 	}
 
 }

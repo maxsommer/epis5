@@ -67,7 +67,7 @@ class City{
 				startPerson = (int)random( 0, humans.size() ); 
 				int i = startPerson;
 				if( 
-						kindergarden.isInKindergarden(i) && !( i == 75 || i == 76 || i == 90 || i == 92 || i == 107 || i == 108)
+						kindergarden.isInKindergarden(i) && !( i == 75 || i == 76 || i == 90 || i == 92 || i == 107 || i == 108 || i == 91)
 					){
 					startPersonGenerated = true;
 				}else{
@@ -175,7 +175,7 @@ class City{
 				Human h = humans.get( i );
 				//	Wahrscheinlichkeit, mit der ein Mensch geimpft ist
 				//	Wird nur geimpft, wenn er nicht Startpunkt des Virus ist
-				if( percentChance( 63 ) && i != startPerson && !kindergarden.isInKindergarden( i ) ){
+				if( percentChance( 64.5 ) && i != startPerson && !kindergarden.isInKindergarden( i ) ){
 
 					h.vaccinate();
 

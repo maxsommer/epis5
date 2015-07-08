@@ -69,6 +69,7 @@ class Virus{
 
 	public void clearList(){
 
+		isMoving = false;
 		moveList = new ArrayList<VirusTarget>();
 
 	}

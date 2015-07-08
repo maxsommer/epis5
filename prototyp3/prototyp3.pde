@@ -6,7 +6,7 @@
 //	sowohl deren Verbreitung als auch die Eindämmung dieser durch Impfung anhand
 //	der Visualisierung einer Stadt (in der Umsetzung spezialisiert auf Dieburg).
 
-//	Prototyp 3, Version 9.6
+//	Prototyp 3, Version 9.7
 //
 //	Ablauf der Stati:
 //		-1: 	Starten der Applikation
@@ -69,9 +69,9 @@ import ddf.minim.*;
 
 //	Einstellungen
 //
-PVector windowResolution = new PVector( 1440, 900 );
+PVector windowResolution = new PVector( 1920, 1080 );
 boolean debugMode = false;
-boolean hideCursor = false;
+boolean hideCursor = true;
 
 int framerate = 120;
 boolean fullscreen = true;
@@ -92,7 +92,7 @@ int startPerson 				= 0;				//	Welche ist diese Startperson?
 int numberInfectedKindergarden	= 0;
 int numberInfectedKindergardenTransition = 12;
 float numberInfectedRightSim 		= 0;
-float numberInfectedRightSimTransition = 70 ;
+float numberInfectedRightSimTransition = 66 ;
 Timer simulationPauseTimer		= new Timer( 1500, true );
 float rightTransitionOffset 		= windowResolution.x;
 boolean vaccineHintShown = false;
@@ -113,6 +113,7 @@ TimeDisplay timeDisplay = new TimeDisplay();
 PFont Pistara72;
 PFont Pistara48;
 PFont Pistara18;
+PFont HelveticaNeue48;
 
 
 //	Hier wird unser Simulationsobjekt erstellt
@@ -147,14 +148,15 @@ void setup(){
 	ellipseMode(CENTER);
 	imageMode(CENTER);
 	//	Schriftart laden
-	Pistara18 	= loadFont("Pistara-18.vlw");
-	Pistara48 	= loadFont("Pistara-48.vlw");
-	Pistara72 	= loadFont("Pistara-72.vlw");
+	Pistara18 		= loadFont("Pistara-18.vlw");
+	Pistara48 		= loadFont("Pistara-48.vlw");
+	Pistara72 		= loadFont("Pistara-72.vlw");
+	HelveticaNeue48 	= loadFont("HelveticaNeue-48.vlw");
 	//	Bilddateien laden
-	virusImage 	= loadImage("virus.png");
-	playImage 	= loadImage("play.png");
-	replayImage 	= loadImage("replay.png");
-	vaccineImage 	= loadImage("vaccine.png");
+	virusImage 		= loadImage("virus.png");
+	playImage 		= loadImage("play.png");
+	replayImage 		= loadImage("replay.png");
+	vaccineImage 		= loadImage("vaccine.png");
 
 	//	textFont( Helvetica );
 	//	Bei der Präsentation möchten wir keine Maus auf dem Bildschirm haben
@@ -224,8 +226,12 @@ public void changeStatus( int newstatus ){
 	//	Maserninfo screen
 	if( currentStatus == 5 ){
 
+		virus.clearList();
+
+		playInfoScreenAnimation();
+
 		simulationPauseTimer.reset();
-		simulationPauseTimer.set( 5000 );
+		simulationPauseTimer.set( 6500 );
 		simulationPauseTimer.start();
 
 	}
@@ -283,6 +289,16 @@ public void changeStatus( int newstatus ){
 
 		sim.city.vaccinateCity();
 
+		//	Übernahme der Simulationsdaten aus dem Kindergarten
+		for( int i = 0; i < sim.city.humans.size(); i++ ){
+
+			Human h = sim2.city.humans.get(i);
+			if( h.isInfecting() ){
+				sim.city.humans.get(i).infect();
+			}
+
+		}
+
 		//	Verschiebung der Kameras
 		sim.cam.moveTo( new PVector( windowResolution.x/4*3, 0 ), 1.0, 1500 );
 		sim2.cam.moveTo( new PVector( windowResolution.x/5*6, 0 ), 1.0, 1500 );
@@ -293,7 +309,7 @@ public void changeStatus( int newstatus ){
 	if( currentStatus == 10 ){
 
 		simulationPauseTimer.reset();
-		simulationPauseTimer.set( 5000 );
+		simulationPauseTimer.set( 7000 );
 		simulationPauseTimer.start();
 
 		caption.vaccinedVisible = true;
@@ -301,16 +317,6 @@ public void changeStatus( int newstatus ){
 	}
 
 	if( currentStatus == 2 ){
-
-		//	Übernahme der Simulationsdaten aus dem Kindergarten
-		for( int i = 0; i < sim.city.humans.size(); i++ ){
-
-			Human h = sim2.city.humans.get(i);
-			if( h.isInfecting() ){
-				sim.city.humans.get(i).infect();
-			}
-
-		}
 		sim.city.startInfection();
 		sim2.city.startInfection();	
 
@@ -322,15 +328,17 @@ public void changeStatus( int newstatus ){
 		simulationPauseTimer.set( 5000 );
 		simulationPauseTimer.start();
 
+			virus.position = new PVector( sim.city.humans.get( vaccinedChild ).position.x + 25 + sim.cam.position.x , sim.city.humans.get( vaccinedChild ).position.y + sim.cam.position.y );
+
+			//playRestartScreenAnimation();
+
+
 		//	Wenn das eigene Kind auf der rechten oder auf beiden Seiten geimpft wurde, dieses
 		//	anzoomen
 		if( 
 			((sim.city.humans.get(91).state == 4) && !( sim2.city.humans.get(91).state == 4) ) ||
 			((sim.city.humans.get(91).state == 4) && ( sim2.city.humans.get(91).state == 4) )
 		){
-
-			virus.clearList();
-			playRestartScreenAnimation();
 			PVector pos = sim.city.humans.get(91).getPosition();
 			PVector camera = sim.cam.position;
 			sim.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
@@ -341,9 +349,6 @@ public void changeStatus( int newstatus ){
 		//	Wenn das eigene Kind auf der linken Seite geimpft wurde, dieses
 		//	anzoomen
 		else if ( sim2.city.humans.get(91).state == 4 && !( sim.city.humans.get(91).state == 4) ){
-
-			virus.clearList();
-			playRestartScreenAnimation();
 			PVector pos = sim2.city.humans.get(91).getPosition();
 			PVector camera = sim2.cam.position;
 			sim2.cam.moveTo( PVector.sub(pos, new PVector(windowResolution.x/8, windowResolution.x/16)), 4.0, 1500 );
@@ -353,9 +358,6 @@ public void changeStatus( int newstatus ){
 		}
 		//	Wenn das eigene Kind auf keine der beiden Seiten geimpft wurde
 		else if(  !(sim.city.humans.get(91).state == 4) && !(sim2.city.humans.get(91).state == 4) ){
-
-			virus.clearList();
-			playRestartScreenAnimation();
 			//	einen geimpften Menschen finden 
 			int i = 0;
 			while( !vaccinedChildFound ){
@@ -429,6 +431,9 @@ public void updateStates(){
 				changeStatus( 6 );
 			}else{
 				showInfoScreen();
+				if( !virus.hasInQueue() ){
+					playInfoScreenAnimation();
+				}
 			}
 		break;
 
@@ -486,9 +491,9 @@ public void updateStates(){
 				textSize( 48 );
 				textFont( Pistara48 );
 				if(kindergardenTextAlpha < 255 )
-					kindergardenTextAlpha+= 0.3;
+					kindergardenTextAlpha+= 0.2;
 				fill(0, 255 - kindergardenTextAlpha);
-				text( kindergardenText, windowResolution.x / 2 - 50, windowResolution.y/2- 360 );
+				text( kindergardenText, windowResolution.x / 2 - 130, windowResolution.y/2- 400 );
 				textSize( 12 );
 			
 
@@ -520,11 +525,11 @@ public void updateStates(){
 			sim.render();
 			sim2.render();		
 				fill( 255, 255, 255, 180 );
-				rect( 0, 0, windowResolution.x, windowResolution.y-140 );
+				rect( 0, 0, windowResolution.x, windowResolution.y-160 );
 				textFont( Pistara48 );
 				textSize(48);
 				fill(0);
-				text( vaccineYourChild, windowResolution.x/2 - 300, windowResolution.y/2 - 360 );
+				text( vaccineYourChild, windowResolution.x/2 - 230, windowResolution.y/2 - 360 );
 				textSize( 12 );
 			sim.city.humans.get(91).render();
 			sim2.city.humans.get(91).render();
@@ -538,26 +543,29 @@ public void updateStates(){
 		break;
 
 		case(2):
-			//	Zeitleiste
-			//timeDisplay.update();
-			//timeDisplay.render();
 			sim.update();
 			sim2.update();
 			sim.render();
 			sim2.render();
 
-				textSize( 36 );
+				textSize( 48 );
+				textFont( Pistara48 );
 				if(cityTextAlpha < 255 )
-					cityTextAlpha+= 1;
+					cityTextAlpha+= 0.35;
 				fill(0, 255 - cityTextAlpha);
-				text( cityText, windowResolution.x / 2 - 50, windowResolution.y/2- 360 );
+				text( cityText, windowResolution.x / 2 - 50, windowResolution.y/2- 400 );
 				fill(0);
-				text( zeroPercentText, windowResolution.x / 5 * 1.15, windowResolution.y/2- 360 );
-				text( realPercentText, windowResolution.x / 5  * 3.35, windowResolution.y/2- 360 );
+				textSize( 36 );
+				textFont( Pistara48);
+				text( zeroPercentText, windowResolution.x / 5 * 1.15, windowResolution.y/2- 400 );
+				text( realPercentText, windowResolution.x / 5  * 3.35, windowResolution.y/2- 400 );
 				textSize( 12 );
 
 			caption.update();
 			caption.render();
+			//	Zeitleiste
+			timeDisplay.update();
+			timeDisplay.render();
 
 		break;
 
@@ -567,6 +575,7 @@ public void updateStates(){
 			sim2.update();
 			sim.render();
 			sim2.render();
+
 				fill( 255, 255, 255, 180 );
 				rect( 0, 0, windowResolution.x, windowResolution.y );
 				if( sim.city.humans.get(91).state == 4 ){
@@ -579,24 +588,17 @@ public void updateStates(){
 					sim.city.humans.get(vaccinedChild).render();
 				}
 
-				textSize( 48 );
+				textFont( Pistara72 );
+				textSize( 72 );
 				fill(0);
-				text( vacciningHelps, windowResolution.x / 2 - 50, windowResolution.y/2- 360 );
+				text( vacciningHelps, windowResolution.x / 2 - 345, windowResolution.y/2- 360 );
 				textSize( 12 );
-			
-
-			restartButton.update();
-			restartButton.render();
-
-			println( virus.position.x );
 
 			virus.update();
 			virus.render();
 
-
-			if( !virus.hasInQueue() ){
-				playRestartScreenAnimation();
-			}
+			restartButton.update();
+			restartButton.render();
 
 		break;
 
@@ -771,16 +773,49 @@ public void playStartScreenAnimation(){
 
 public void playRestartScreenAnimation(){
 
+	virus.moveTo( sim.city.humans.get( vaccinedChild ).position.x + 25, sim.city.humans.get( vaccinedChild ).position.y, 500, 2 );
+	virus.moveTo( sim.city.humans.get( vaccinedChild ).position.x + 300, sim.city.humans.get( vaccinedChild ).position.y, 700, 3 );
+
+}
+
+
+public void playInfoScreenAnimation(){
+
+	virus.moveTo( windowResolution.x/2 -300 - sim2.cam.getPosition().x, windowResolution.y/2 - 230 - sim2.cam.getPosition().y, 1000 );
+	virus.moveTo( windowResolution.x/2+ 0 - sim2.cam.getPosition().x, windowResolution.y/2 - 250 - sim2.cam.getPosition().y, 1000 );
+	virus.moveTo( windowResolution.x/2+ 300 - sim2.cam.getPosition().x, windowResolution.y/2 - 230 - sim2.cam.getPosition().y, 1000 );
+	virus.moveTo( windowResolution.x/2+ 0 - sim2.cam.getPosition().x, windowResolution.y/2 - 250 - sim2.cam.getPosition().y, 1000 );
+
+
+
+/*
+	virus.moveTo( windowResolution.x / 2 + 0, windowResolution.y / 2 + 400, 1000 );
+	virus.moveTo( windowResolution.x / 2 + 300, windowResolution.y / 2 + 300, 1000 );
+	virus.moveTo( windowResolution.x / 2 + 600, windowResolution.y / 2 + 400, 1000 );
+	virus.moveTo( windowResolution.x / 2 + 500, windowResolution.y / 2 + 0, 1000 );
+	virus.moveTo( windowResolution.x / 2 + 600, windowResolution.y / 2 - 400, 1000 );
+	virus.moveTo( windowResolution.x / 2 + 300, windowResolution.y / 2 - 300, 1000 );
+	virus.moveTo( windowResolution.x / 2 + 0, windowResolution.y / 2 - 400, 1000 );
+	virus.moveTo( windowResolution.x / 2 - 300, windowResolution.y / 2 - 300, 1000 );
+	virus.moveTo( windowResolution.x / 2 - 600, windowResolution.y / 2 - 400, 1000 );
+	virus.moveTo( windowResolution.x / 2 - 500, windowResolution.y / 2 - 0, 1000 );
+	virus.moveTo( windowResolution.x / 2 - 600, windowResolution.y / 2 +400, 1000 );
+	virus.moveTo( windowResolution.x / 2 - 300, windowResolution.y / 2 +300, 1000 );
+*/
+
 }
 
 
 public void showInfoScreen(){
+	fill( 255, 50 );
+	rect( 0 , 0, windowResolution.x, windowResolution.y );
 
-	textSize( 48 );
-	textFont( Pistara48 );
 	fill( 0 );
+	textFont( Pistara72 );
+	textSize(72);
+	text( measlesInfo, windowResolution.x/2-100 - sim2.cam.getPosition().x, windowResolution.y/2 - 100 - sim2.cam.getPosition().y);
+	textFont( Pistara48 );
 	textSize(36);
-	text( measlesInfo, windowResolution.x/2-50 - sim2.cam.getPosition().x, windowResolution.y/2 - 200 - sim2.cam.getPosition().y);
-	text( measlesInfoExtended, windowResolution.x/2-320 - sim2.cam.getPosition().x, windowResolution.y/2 - 120 - sim2.cam.getPosition().y);
+	text( measlesInfoExtended, windowResolution.x/2-340 - sim2.cam.getPosition().x, windowResolution.y/2 - 20 - sim2.cam.getPosition().y);
 
 }
